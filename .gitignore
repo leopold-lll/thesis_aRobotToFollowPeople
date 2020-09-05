@@ -1,6 +1,9 @@
+*.eps
+*.toc
 *.aux
 *.bbl
 *.blg
 *.log
-*.toc
-*.eps
+*.synctex.gz
+*.synctex(busy)
+*.out
