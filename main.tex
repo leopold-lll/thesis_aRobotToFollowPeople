@@ -23,6 +23,7 @@
 
 % Packeage added by me:
 \usepackage{hyperref}	%the reference are links and not only numbers
+%\usepackage[hidelinks]{hyperref} %usethis option to remove coloured rectangles around the reference (useful for print the PDF)
 %NB: first we need to include hyperref and only after cleverref
 \usepackage{cleveref}	%allow the use of \Cref to refer to elements
 
@@ -42,7 +43,7 @@
 
   % nessuna numerazione
   \pagenumbering{gobble} 
-  \input{pagina_iniziale}
+  \input{0-frontespizio}
 
   \clearpage
  
@@ -53,9 +54,9 @@
 %% Sezione Ringraziamenti opzionale
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \input{ringraziamenti}
+  \input{0-ringraziamenti}
   \clearpage
-  \pagestyle{plain} % nessuna intestazione e pie pagina con numero al centro
+  %\pagestyle{plain} % nessuna intestazione e pie pagina con numero al centro
 
   
   % inizio numerazione pagine in numeri arabi
@@ -124,13 +125,14 @@
       %
       % \input oppure \include
       %
-      % sommario
-      \input{sommario}
-      \input{modelloBase}
-      \input{capitolo1}	\clearpage
-      \input{capitolo2} \clearpage
-      \input{capitolo3} \clearpage
-      %\input{capitolo4}
+      %\input{modelloBase}
+      \input{1-summary}		\clearpage
+      \input{2-introduction}\clearpage
+      \input{3-detection} 	\clearpage
+      \input{4-tracking} 	\clearpage
+      \input{5-recognition} \clearpage
+      \input{6-solution} 	\clearpage
+      \input{7-conclusion} 	\clearpage
       
       
     \endgroup
@@ -172,10 +174,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 
-    \titleformat{\chapter}
-        {\normalfont\Huge\bfseries}{Allegato \thechapter}{1em}{}
+    %\titleformat{\chapter}
+    %    {\normalfont\Huge\bfseries}{Allegato \thechapter}{1em}{}
     % sezione Allegati - opzionale
-    \appendix
-    \input{allegati}
+	%\appendix
+    %\input{allegati}
 
 \end{document}
