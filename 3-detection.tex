@@ -1,1 +1,110 @@
-\chapter{Detection} \label{cha:detection}
+\chapter{Object Detection} \label{cha:detection}
+This chapter explains into the details what is the object detection task and the methods that can solve it efficiently. An overview of other methods is given, both for the not efficient one but also for problems that may look similar but are not the same. 
+
+\section{Task definition}
+Object detection, also know as \textbf{object localization}, is an evolution of the \textbf{image classification} (\Cref{fig:imgAnalysisType}). In classification, an algorithm should produce a list of all the classes of objects inside the image. Instead, the detection not only calculates which object class exist but also how many occurrences are present for each class. Then the complex part, and the most interesting one for this thesis application, is localizing where those elements are placed inside the image. The position is not considered as a point but as a bounding box defined as the smaller rectangle that contains the entire element. An example of object detection is shown in~\Cref{fig:sampleYolo}.
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/ex1_yolo.jpg}
+	\caption{Object detection applied on a sample image.}
+	\label{fig:sampleYolo}
+\end{figure}
+
+\subsection{Similar tasks}
+Object detection can be additionally improved to extract even more information from an image.\\
+The main evolutions, shown in~\Cref{fig:imgAnalysisType} are:
+\begin{itemize}
+	\item \textbf{Semantic segmentation:} took all the bounding boxes produced by an object detector, and for each one, it calculates the pixels that belong to the object itself and the one that not. Doing this each class has its own colour associated. As result, the algorithm knows for each pixel if it belongs to one label (semantic division) associated with the image or to the background (yellow in the image).
+	\item \textbf{Instance segmentation:} is similar to semantic segmentation, but in this case, each instance of an object is considered as a new element. In fact, the three cubes in the figure have associated different colours.\\
+	This task is solved by the \textbf{Mask-R-CNN algorithm} (\Cref{sec:maskRCNN})
+	\item \textbf{(Human) pose estimation:} is the more complex task between the five. Mainly applied to people, this challenge consists in the estimation of the 3D position of the body. The idea is to build up a skeleton of the person in the image and understand how its body limbs are positioned. This functionality is important to understand what a person is doing in the image.\\
+	This task is solved by the \textbf{OpenPose estimation algorithm} (\Cref{sec:openPose})
+\end{itemize}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/types-of-img-analysis.jpg}
+	\caption{Similar problems respect to object localization/detection.}
+	\label{fig:imgAnalysisType}
+\end{figure}
+
+
+\section{State of the art algorithms}
+Object detection has a lot of application both in real-time, such this one, but also into safety-critical scenarios like cars with autonomous driving. This division brings out two different metrics: precision and speed. The ideal detector is both fast and precise, but this algorithm does not exist yet. The methods can be divided into two.\\
+The solution mainly focused on speed: YOLO (\Cref{sec:yolo}) and SSD (\Cref{sec:ssd}).\\
+Instead, the one mainly focused on precision is R-CNN (\Cref{sec:r-cnn}).
+
+\subsection{YOLO (You Only Look Once)} \label{sec:yolo}
+YOLO\cite{yolo} was initially designed in 2016. At that time was the first object detector approach to use a single neural network. Redmon et al. goals were to create an extremely fast detector. An overview of the overall procedure is to show in~\Cref{fig:howItWorks_yolo}.\\
+The image shows a two steps procedure, but these steps are solved in parallel. This is the core idea of the paper. A single neural network can be highly optimized.\\
+The YOLO procedure works as follow\footnote{The original presentation of YOLO by Redmon at the CVPR 2016 can be found \href{https://www.youtube.com/watch?v=NM6lrxy0bxs}{here}.}:
+\begin{itemize}
+	\item Preprocess: The image is resized to fit the standard input dimension of the neural network
+	\item Left image: Then it is divided into a grid of SxS cells
+	\item Top image: Each cell proposes some bounding box centred on it that can match elements in the background. To each box is associated value describing the probability that it contains one of the elements of the image
+	\item Bottom image: To each cell is associated with a probability regarding a class that represents the class that can be found in that cell if an element exists in it.\\
+	I.e. the cyan cells means: "if there is something here, it will belong to class 'DOG' ".
+	\item Right image: the two partial elaborations are merged. The most likely bounding boxes are chosen and classes are associated to them according to the probability for each cell in the probability map.
+\end{itemize}
+
+That was the first YOLO version, in this thesis is used the third\cite{yoloV3}. Mainly the changes were about recognition of a wider set of classes and small implementing details to improve the overall precision of the algorithm.\\
+\\
+The output of the neural network is generated extremely fast and it is accurate but has a big problem. Often if two classes have similar probabilities or the shape of the element is not perfect YOLO might propose more than one bounding box for each element. That's the case of~\Cref{fig:sub_noNMS_yolo} where the truck is classified both as "truck" but also as "car". The same happens to the person that has been seen twice.\\
+To solve this, it is necessary to apply a new technique: Non-Maximum Suppression.
+
+\subsubsection*{NMS (Non-Maximum Suppression)}
+This technique\cite{nms} is post-processing that works only on the bounding boxes proposed as output from YOLO or other detectors. It does not consider the source image. The goal of this procedure is to refine the bounding boxes proposed and choose which set of them is better to fit the final image prediction. Two examples of applications are shown in~\Cref{fig:nms}\\
+The main flow of the algorithm is as follow:
+\begin{itemize}
+	\item The input is a list of all the boxes generated for a single image. Associated to each one there is its probability.
+	\item The boxes are sorted in decreasing order according to the probability associated.
+	\item Then in order, each box is accepted or rejected according to the \textbf{IoU (Intersection Over Union)}. That is the percentage of overlapping area with an already accepted box.
+	\begin{itemize}
+		\item If the IoU is above a certain threshold, meaning that the two boxes are too similar the one with the lower probability is discarded.
+		\item If that's not the case the box is accepted as a new prediction.
+	\end{itemize}
+\end{itemize}
+
+The input in~\Cref{fig:sub_noNMS}, is processed and only one box is accepted (\Cref{fig:sub_withNMS}) because the IoU is very high. Instead, in~\Cref{fig:sub_noNMS_yolo} two boxes are removed respectively from two other separated boxes (\Cref{fig:sub_withNMS_yolo}) because two different subjects are involved.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/howItWorks_yolo}
+	\caption{The YOLO image elaboration based on bounding box proposal and class probability map.}
+	\label{fig:howItWorks_yolo}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{.14\linewidth}
+		\includegraphics[width=0.9\linewidth]{images/img1_noNMS}
+		\caption{Bounding boxes overlap}
+		\label{fig:sub_noNMS}
+	\end{subfigure}
+	\begin{subfigure}{.14\linewidth}
+		\includegraphics[width=0.9\linewidth]{images/img1_withNMS}
+		\caption{Generated bounding box}
+		\label{fig:sub_withNMS}
+	\end{subfigure}
+	\begin{subfigure}{.35\linewidth}
+		\includegraphics[width=0.9\linewidth]{images/ex2_yolo_noNMS}
+		\caption{A YOLO generated bounding boxes}
+		\label{fig:sub_noNMS_yolo}
+	\end{subfigure}
+	\begin{subfigure}{.35\linewidth}
+		\includegraphics[width=0.9\linewidth]{images/ex2_yolo}
+		\caption{Apply NMS to get correct output}
+		\label{fig:sub_withNMS_yolo}
+	\end{subfigure}
+	\caption{Two scenarios of application of Non-maximum suppression algorithm. First: choose which of the 6 manual generated bounding boxes, on Audrey Hepburn face, should be considered the correct one. Second: refinement of the YOLO prediction output, by removing the "car" and "person" prediction.}
+	\label{fig:nms}
+\end{figure}
+
+\subsection{SSD (Single Shot Multibox detector)} \label{sec:ssd} 
+\cite{ssd}
+\subsection{R-CNN (???)} \label{sec:r-cnn}
+
+\section{Other famous algorithms}
+4-5\\
+bounding box
+
+\section{Which algorithm for our scenario}
