@@ -13,3 +13,6 @@
 # main_*.pdf
 # main-*.pdf
 main *.pdf
+
+#unused images
+images/notUsed/

@@ -7,7 +7,7 @@ This chapter explains into the details what is the object detection task and the
 Object detection, also know as \textbf{object localization}, is an evolution of the \textbf{image classification} (\Cref{fig:imgAnalysisType}). In classification, an algorithm should produce a list of all the classes of objects inside the image. Instead, the detection not only calculates which object class exist but also how many occurrences are present for each class. Then the complex part, and the most interesting one for this thesis application, is localizing where those elements are placed inside the image. The position is not considered as a point but as a bounding box defined as the smaller rectangle that contains the entire element. An example of object detection is shown in~\Cref{fig:sampleYolo}.
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.8\linewidth]{images/detection/ex1_yolo.jpg}
+	\includegraphics[width=0.8\linewidth]{images/detection/ex1_yolo}
 	\caption{Object detection applied on a sample image.}
 	\label{fig:sampleYolo}
 \end{figure}
@@ -24,7 +24,7 @@ The main evolutions, shown in~\Cref{fig:imgAnalysisType} are:
 \end{itemize}
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{images/detection/types-of-img-analysis.jpg}
+	\includegraphics[width=0.7\linewidth]{images/detection/types-of-img-analysis}
 	\caption{Similar problems respect to object localization/detection.}
 	\label{fig:imgAnalysisType}
 \end{figure}
@@ -226,13 +226,13 @@ It is important to note that OpenPose is a bottom-up approach. The algorithm has
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\linewidth]{images/detection/howItWorks_openpose}
+	\includegraphics[width=0.8\linewidth]{images/detection/howItWorks_openpose_2line}
 	\caption{The elaboration of the OpenPose algorithm to recognise the skeleton of the two dancers in the image.}
 	\label{fig:howItWorks_openpose}
 \end{figure}
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\linewidth]{images/detection/ex_openpose}
+	\includegraphics[width=1\linewidth]{images/detection/ex_openpose_2line}
 	\caption{Some examples, taken from the original paper, on how OpenPose works.}
 	\label{fig:ex_openpose}
 \end{figure}

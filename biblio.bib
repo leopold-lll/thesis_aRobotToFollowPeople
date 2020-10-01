@@ -4,6 +4,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%   PAPERS   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%% DETECTION
 @inproceedings{multi-feature-fusion-and-yolo,
 	title={Long-term tracking algorithm with the combination of multi-feature fusion and YOLO},
 	author={Jiang, Sicong and Zhang, Jianing and Zhang, Yunzhou and Qiu, Feng and Wang, Dongdong and Liu, Xiaobo},
@@ -131,13 +132,56 @@ organization={Springer}
 	year={2015}
 }
 
-%TRACKING
-@inproceedings{csrt,
-	title={Discriminative correlation filter with channel and spatial reliability},
-	author={Lukezic, Alan and Vojir, Tomas and ˇCehovin Zajc, Luka and Matas, Jiri and Kristan, Matej},
-	booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
-	pages={6309--6318},
-	year={2017}
+%%% TRACKING
+%KCF
+@inproceedings{boosting,
+	title={Real-time tracking via on-line boosting.},
+	author={Grabner, Helmut and Grabner, Michael and Bischof, Horst},
+	booktitle={Bmvc},
+	volume={1},
+	number={5},
+	pages={6},
+	year={2006}
+}
+
+@inproceedings{fragTrack,
+	title={Robust fragments-based tracking using the integral histogram},
+	author={Adam, Amit and Rivlin, Ehud and Shimshoni, Ilan},
+	booktitle={2006 IEEE Computer society conference on computer vision and pattern recognition (CVPR'06)},
+	volume={1},
+	pages={798--805},
+	year={2006},
+	organization={IEEE}
+}
+
+@inproceedings{onlineAdaBoostTracker,
+	title={Real-time tracking via on-line boosting.},
+	author={Grabner, Helmut and Grabner, Michael and Bischof, Horst},
+	booktitle={Bmvc},
+	volume={1},
+	number={5},
+	pages={6},
+	year={2006}
+}
+
+@inproceedings{mil,
+	title={Visual tracking with online multiple instance learning},
+	author={Babenko, Boris and Yang, Ming-Hsuan and Belongie, Serge},
+	booktitle={2009 IEEE Conference on computer vision and Pattern Recognition},
+	pages={983--990},
+	year={2009},
+	organization={IEEE}
+}
+
+@article{mil-robust,
+	title={Robust object tracking with online multiple instance learning},
+	author={Babenko, Boris and Yang, Ming-Hsuan and Belongie, Serge},
+	journal={IEEE transactions on pattern analysis and machine intelligence},
+	volume={33},
+	number={8},
+	pages={1619--1632},
+	year={2010},
+	publisher={IEEE}
 }
 
 @inproceedings{kcf,
@@ -149,7 +193,7 @@ organization={Springer}
 	organization={Springer}
 }
 
-@inproceedings{kcf-improvement,
+@inproceedings{kcf-withColor,
 	title={Adaptive color attributes for real-time visual tracking},
 	author={Danelljan, Martin and Shahbaz Khan, Fahad and Felsberg, Michael and Van de Weijer, Joost},
 	booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
@@ -157,6 +201,7 @@ organization={Springer}
 	year={2014}
 }
 
+%OTHER
 @article{tld,
 	title={Tracking-learning-detection},
 	author={Kalal, Zdenek and Mikolajczyk, Krystian and Matas, Jiri},
@@ -166,6 +211,32 @@ organization={Springer}
 	pages={1409--1422},
 	year={2011},
 	publisher={IEEE}
+}
+
+@inproceedings{medianFlow,
+	title={Forward-backward error: Automatic detection of tracking failures},
+	author={Kalal, Zdenek and Mikolajczyk, Krystian and Matas, Jiri},
+	booktitle={2010 20th International Conference on Pattern Recognition},
+	pages={2756--2759},
+	year={2010},
+	organization={IEEE}
+}
+
+@inproceedings{mosse,
+	title={Visual object tracking using adaptive correlation filters},
+	author={Bolme, David S and Beveridge, J Ross and Draper, Bruce A and Lui, Yui Man},
+	booktitle={2010 IEEE computer society conference on computer vision and pattern recognition},
+	pages={2544--2550},
+	year={2010},
+	organization={IEEE}
+}
+
+@inproceedings{csrt,
+	title={Discriminative correlation filter with channel and spatial reliability},
+	author={Lukezic, Alan and Vojir, Tomas and ˇCehovin Zajc, Luka and Matas, Jiri and Kristan, Matej},
+	booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+	pages={6309--6318},
+	year={2017}
 }
 
 @inproceedings{goturn,
@@ -179,6 +250,7 @@ organization={Springer}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%   CODE    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%mio codice
 %%%%%%%%%%%%%%%%%%%%%%%%%%%   WEBSITE   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 @misc{dolomitiRobotics,
@@ -190,6 +262,9 @@ organization={Springer}
 title = {Wordnet graph},
 howpublished = {\url{https://wordnet.princeton.edu/}}
 }
+
+%pyimagesearch
+%learnOpenCV
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%   DATASET   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 @misc{pascal-voc-2007,
