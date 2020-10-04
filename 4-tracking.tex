@@ -1,5 +1,5 @@
 \chapter{Object Tracking} \label{cha:tracking}
-The chapter is focused on a few methods that solve the traditional task of object tracking. For each algorithm, the potentiality is shown and the advantages compared to other methods, will be discussed. In addition, an overview of similar problems is given\Cref{sec:tracking-conditions}.
+The chapter is focused on a few methods that solve the traditional task of object tracking. For each algorithm, the potentiality is shown and the advantages compared to other methods, will be discussed. In addition, an overview of similar problems is given in ~\Cref{sec:tracking-conditions}.
 
 
 
@@ -104,6 +104,7 @@ Below are listed a set of requirements that make the baseline harder (definition
 	\end{subfigure}
 	\begin{subfigure}[!h]{0.54\textwidth}
 		\includegraphics[width=\linewidth]{images/tracking/challenge_deformation}
+		\captionsetup{margin=0.5cm}
 		\caption{Two subject that can vary their appearance very quickly.}
 		\label{fig:challenge_deformation}
 	\end{subfigure}
@@ -115,11 +116,12 @@ Below are listed a set of requirements that make the baseline harder (definition
 	%
 	\begin{subfigure}[!h]{0.19\textwidth}
 		\includegraphics[width=\linewidth]{images/tracking/challenge_blurred}
-		\caption{The limbs of Usain Bolt seems to disappear.}
+		\caption{The limbs disappears.}
 		\label{fig:challenge_blurred}
 	\end{subfigure}
 	\begin{subfigure}[!h]{0.49\textwidth}
 		\includegraphics[width=\linewidth]{images/tracking/challenge_multiple}
+		\captionsetup{margin=0.5cm}
 		\caption{A soccer match action where all the players are tracked.}
 		\label{fig:challenge_multiple}
 	\end{subfigure}
@@ -136,6 +138,7 @@ Below are listed a set of requirements that make the baseline harder (definition
 	\end{subfigure}
 	\begin{subfigure}[!h]{0.49\textwidth}
 		\includegraphics[width=\linewidth]{images/tracking/challenge_multivariate}
+		\captionsetup{margin=0.5cm}
 		\caption{The probability of where the new location is respect a multivariate normal distribution.}
 		\label{fig:challenge_multivariate}
 	\end{subfigure}
@@ -207,7 +210,7 @@ The novelty introduced with KCF allows this algorithm to outperform both BOOSTIN
 
 \subsection{Median Flow tracker} \label{sec:medianflow}
 The Median Flow tracker\cite{medianFlow} is a reliable method that locates the subject according to its trajectory. The key idea is that the algorithm recognises points in two subsequent frames, these points should be the same physical element in the real space.\\
-The overall procedure is shown in~\Cref{fig:howItWorks_medianFlow}. The first step (~\Cref{fig:howItWorks_medianFlow_points}) consist of creating a grid of points on the initial bounding box, and then locate these points in all the future frames. This connection through the frames helps to know the exact motion model of the tracked algorithm. The \textbf{motion model}($MM$) is the combination of actual position ($x, y$) and velocity defined with the angle or direction of motion($\theta$) and the module of the speed($s$). Essentially knowing how the subject is moving help to predict where it will be in the near future.
+The overall procedure is shown in~\Cref{fig:howItWorks_medianFlow}. The first step (~\Cref{fig:howItWorks_medianFlow_points}) consist of creating a grid of points on the initial bounding box, and then locate these points in all the future frames. This connection through the frames helps to know the exact motion model of the tracked algorithm. The \textbf{Motion Model}($MM$) is the combination of actual position ($x, y$) and velocity defined with the angle or direction of motion($\theta$) and the module of the speed($s$). Essentially knowing how the subject is moving help to predict where it will be in the near future.
 $$MM = ((x, y), (\theta, s))$$
 The interaction of the frames works as follow. Every time that a new frame is added the knowledge of the motion model suggests where the subject can be located. Then, the key points are researched in this new image. Ones are found it is fundamental to check the consistency of the trajectories (\Cref{fig:howItWorks_medianFlow_trajectory}). Each new point is associated with the most similar already known physical point and vice versa. If this double matching is correct and the two points refer to the same physical element (point 1 in the figure), the trajectory is confirmed otherwise (point 2 in the figure) there is a misalignment in the trajectories. In~\Cref{fig:howItWorks_medianFlow_trajectory} point 2 is firstly, forward pass, associated with the front wheel, in the frame after is linked to the back wheel since the other one is hidden from the street signal. The backward pass links the back wheel again on itself. This misalignment of the connection is recognised as an error and so that point cannot be trusted. If no point can be trusted the tracking fails.\\
 \\
@@ -259,7 +262,7 @@ The MOSSE algotihm\cite{mosse} such as KCF (\Cref{sec:kcf}) is a method whose st
 The novelty is introduced with a new correlation filter, called MOSSE. It can be applied to the input frames and precisely locate the variations fundamental to understand the movement of the subject.\\
 Despite the original article boasts robustness against variations in lighting, scale, and non-rigid deformations, this algorithms is not so reliable as appears. On the other hand, the strength of this method is the extremely fast computations (FPS rate) that outperform all the other trackers presented in this section.
 
-\subsection{GOTURN (Generic Object Tracking Using Regression Networks)}
+\subsection{GOTURN (Generic Object Tracking Using Regression Networks)} \label{sec:goturn}
 GOTURN\cite{goturn} is a tracker based on neural networks. Differently from MIL and KCF (\Cref{sec:kcf}), this method is not based on an online NN, such as the online classifier, but it is based on an offline CNN.\\
 An \textbf{offline NN} is a traditional NN that is trained on thousands of data, couples of images, in this case, producing a trained model. The process is done in advance, before the effective use, and not "on the fly" while running the tracker. The generated model is used at run time to know how to respond to an input value. The big advantage of offline methods is that the training procedure is the slower section, for this reason, an online classifier could not perform at very high FPS rates.\\
 \\
