@@ -8,6 +8,13 @@
 *.synctex.gz
 *.synctex(busy)
 *.out
+*.acn
+*.glo
+*.ist
+*.lof
+*.lot
+
+listOfAcronyms.txt
 
 # partially completed version of the thesis
 # main_*.pdf

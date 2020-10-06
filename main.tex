@@ -29,13 +29,13 @@
 \usepackage{changepage}	%allow to locally modify the margins (i.e. in the front page)
 \usepackage{tcolorbox} 	%allow to create rectangle to highlight text
 \usepackage{pifont}		%allow to use extra characters
+\usepackage[shortlabels]{enumitem}  %enumerate with letters
 
 %useful for side by side images display
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
 
-\usepackage[shortlabels]{enumitem} %enumerate with letters
 
 %new commands
 \newcommand{\bb}[0]{bounding box}
@@ -95,7 +95,6 @@
     \tableofcontents
     \clearpage
     
-    
           
     % gruppo per definizone di successione capitoli senza interruzione di pagina
     \begingroup
@@ -138,23 +137,23 @@
       %
       % \input oppure \include
       %
-      %\input{modelloBase}
+      \input{0-acronyms}
       \input{1-summary}		\clearpage
-      %\input{2-introduction}\clearpage
-      %\input{3-detection} 	\clearpage
-      %\input{4-tracking} 	\clearpage
+      \input{2-introduction}\clearpage
+      \input{3-detection} 	\clearpage
+      \input{4-tracking} 	\clearpage
       \input{5-recognition} \clearpage
       \input{6-solution} 	\clearpage
-      \input{7-conclusion} 	\clearpage
+      \input{7-conclusion} \clearpage
       
       
     \endgroup
 
-
     % bibliografia in formato bibtex
     %
     % aggiunta del capitolo nell'indice
-    \addcontentsline{toc}{chapter}{Bibliografia}
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Bibliography}
     % stile con ordinamento alfabetico in funzione degli autori
     \bibliographystyle{unsrt}
     \bibliography{biblio}
