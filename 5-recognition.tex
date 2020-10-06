@@ -1,15 +1,15 @@
-	\chapter{People Recognition} \label{cha:recognition}
+\chapter{People Recognition} \label{cha:recognition}
 The goal of this chapter is to shows which types of techniques could be used to understand, given two images of a human, if the represented person is the same or not.
 
 \section{Problem definition}
-The \textbf{people recognition module}, also known as the \textbf{people identifier module}, overall the entire project as the role of connecting in a consistent way the two remaining modules, the detector and the tracker. The tracker works for the majority of the time, following the \textbf{main subject}, called \textbf{leader}. Then, when it fails or after a certain amout of time, the detector locates all the people in the incoming frame. Finally, the recognizer has to answer a simple question:
+The \textbf{people recognition module}, also known as the \textbf{people identifier module}, overall the entire project as the role of connecting in a consistent way the two remaining modules, the detector and the tracker. The tracker works for the majority of the time, following the \textbf{main subject}, called \textbf{Leader}. Then, when it fails or after a certain amout of time, the detector locates all the people in the incoming frame. Finally, the recognizer has to answer a simple question:
 \begin{tcolorbox}
 	\begin{center}
-		\underline{\textit{Is this person the leader?}}\\
+		\underline{\textit{Is this person the Leader?}}\\
 		Formally, given an image, cropped on the bounding box of a person, and a set of other images, with the same characteristics, containing various people labelled with names. Choose which is the name of the unknown person.
 	\end{center}
 \end{tcolorbox}
-In our specific scenario, we are interested only into understanding if a bounding box contains a representation of the leader or not. For this reason the label can be considered with only two values: "\textit{positive}" or "\textit{negative}", "\textit{leader}" or "\textit{other}".\\
+In our specific scenario, we are interested only into understanding if a bounding box contains a representation of the Leader or not. For this reason the label can be considered with only two values: "\textit{positive}" or "\textit{negative}", "\textit{Leader}" or "\textit{other}".\\
 
 \subsection{Video surveillance application}
 This challenge is extremely important in the video surveillance field. In fact, one of the most common application is to reconstruct where a person was seen during a certain time slot. The video surveillance application is a little bit different from the one in which we are interested:
@@ -28,7 +28,7 @@ This section is focused on some unsuccessful technique was explored during the d
 \subsection{Offline algorithms}
 An offline algorithm (explained in~\Cref{sec:goturn}) is a great choice for training methods able to judge situations quickly. In this case, we have considered an \textbf{SVM (Support Vector Machine) classifier}.\\
 This method is a supervised learning model based on a linear separator. The essential idea is to find the line\footnote{A line in 2D problems, that is converted into a hyperplane in N-dimensional scenarios.} that divide the dataset into two sections where respectively the two classes of interest lie (a visual representation is given in~\Cref{fig:howItWorks_svm}). The method could work if each image of a person is converted into a point, as explained in~\Cref{sec:classifiers}.\\
-But this approach has a ground truth problem. The offline methods require prior knowledge of the context of application to train ad hoc models. In our case, the element to know is "\textit{Who is the leader?}". Based on this information the dataset can be split into two classes, the images representing the leader and the other ones, then the SVM classifier can be trained. The result is a model that always recognise one person, exactly the same person all the times.\\
+But this approach has a ground truth problem. The offline methods require prior knowledge of the context of application to train ad hoc models. In our case, the element to know is "\textit{Who is the Leader?}". Based on this information the dataset can be split into two classes, the images representing the Leader and the other ones, then the SVM classifier can be trained. The result is a model that always recognise one person, exactly the same person all the times.\\
 Unluckily, this prior knowledge is not given. The algorithm should recognise all types of people after seeing them for a few seconds. This is the context where an online algorithm can be wisely used.
 \begin{figure}
 	\centering
@@ -173,7 +173,7 @@ The image classifiers based on CNN work as follows:
 \begin{enumerate}
 	\item The input picture is resized to standard dimensions. In addition, colours and lights are normalized.
 	\item The image is elaborated with multiple blocks of convolution's layers.
-	\item All the features extracted with the convolutions are collapsed, with a "\textit{flatten operation}", into an array.
+	\item All the features extracted with the convolutions are collapsed, with a "\textit{flatten operation}", into an array of thousands of elements.
 	\item In the end, this vector is eventually reduced and the final predictions, one for each output class, are generated.
 \end{enumerate}
 The goal is to generate a point from the input image of CNN. The fourth part collapses all the elaborated information into predictions that vary according to the context of the application. Instead, the third level produces an array: a list of N numbers that can be seen as coordinates of a point into an \textbf{N-dimensional space}. KNN works independently from the space dimensionality, so, it does not matter how many features are produced the CNN based algorithms.\\
@@ -183,12 +183,12 @@ The classifier chosen are the DNNs (Deep Neural Networks) \textbf{GoogLeNet} and
 \subsubsection*{ResNet (Residual Network)}
 ResNet\cite{resNet_paper} is build on top of the idea of "skip blocks of layers". The residual block is shown in~\Cref{fig:howItWorks_resNet}.\\
 A "\textit{plain CNN}" has convolutions stacked one after the other, in this case, there is an additional element: the \textbf{identity connection}. It means that no filters are applied, the input is shifted two layers down. This connection is used to propagate the information deep into the CNN without modifying them. The advantage is that the input image is preserved through the network and it is not affected by an elaboration that lasts for several layers (more than 100). This novelty is very important for small training sets that are not able to fine-tune all millions of parameters of the DNN.\\
-The original paper comes out with multiple models characterized by different depths, for this thesis we have chosen ResNet50\cite{resNet_model}.
+The original paper comes out with multiple models characterized by different depths, for this thesis we have chosen ResNet50\cite{resNet_model}. This model produces a representation point in 2048 dimensions.
 
 \subsubsection*{GoogLeNet (Google Le-Network)}
 GoogLeNet\cite{googLeNet_paper} is based on a new convolution scheme called \textbf{Inception module}. The name and the goal of module comes from the quote “\textit{We need to go deeper}”\footnote{Quote of the film Inception (\href{https://i.kym-cdn.com/photos/images/newsfeed/000/531/557/a88.jpg}{meme})}.\\
 The naive version of the inception module parallelizes three different convolution filters (1x1, 3x3, 5x5) and a \textit{max-pooling filter}. This special elaboration reduces the depth of the CNN while preserving its potentiality. On the other hand, the number of parameters is still huge. The official version of the inception module (\Cref{fig:howItWorks_inceptionModule}) stacks each filter (3x3, 5x5 and max-pooling) with a 1x1 convolution to reduce, by a factor of 10, the overall number of parameters.\\
-We have used the model\cite{googleNet_model} proposed together with the paper.
+We have used the model\cite{googleNet_model} proposed together with the paper. This GoogLeNet implementation produce a representation point in 1024 dimensions (half of ResNet50).
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/recognition/howItWorks_inceptionModule}

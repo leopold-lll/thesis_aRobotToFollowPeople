@@ -3,120 +3,117 @@ This chapter offers an overview of the project on which the thesis is based. The
 
 
 \section{Physical context}
-The physical component in this project is a robot. Its definition can vary a lot respect to the context in which it is used. For this project, a robot can be described as a vehicle able to move in the space. A \textbf{LIDAR (Laser Imaging Detection And Ranging)} sensor is mounted. It is used to drive in the space avoiding hitting physical obstacles during the movement. In addition, it is installed a computational device connected to a webcam that can record streams of images of the space in front of the robot itself.\\
-The video camera is the eyes of the robot itself, and the captured video stream is used as input of the algorithm working on the computational device. This computer can be both composed of a \textbf{CPU (Central Processing Unit)} but more often it is built with a \textbf{GPU (Graphics Processing Unit)} that can speed up parallelized computation, applied on the \textbf{DNNs (Deep Neural Networks)} used as the core of the algorithm. The software does not assume one component respect to the other, the only variation is in the performances: a GPU computation speed can be much higher than a CPU.\\
-Instead, the output of the algorithm is a position composed of X and Y coordinates respect to a single frame captured from the webcam. This location can be then elaborated and, with the use of LIDAR sensor, the robot can estimate which is the 3D position of the element tracked from the software.\\
+The physical component in this project is a robot. Its definition can vary a lot basing on the context in which it is used. For this project, a robot can be described as a vehicle able to move in the space. A \textbf{LIDAR (Laser Imaging Detection And Ranging)} sensor is mounted. Which allows to drive in the space avoiding physical obstacles during the movement. In addition, it is installed a computational device connected to a webcam that can record streams of images representing the space in front of the robot itself.\\
+The video camera becomes the eye of the robot itself, and the captured video stream is used as the input of the algorithm working on the computational device. This computer can be composed of a \textbf{CPU (Central Processing Unit)} or more likely it is built with a \textbf{GPU (Graphics Processing Unit)} that can speed up parallelized computation, applied on the \textbf{DNNs (Deep Neural Networks)} used as the core of the algorithm. The software does not assume one component over the other, the only variation is in the performances: a GPU computation speed can be much higher than a CPU.\\
+Instead, the output of the algorithm is a position composed of X and Y pixel coordinates calculated on a single frame captured from the webcam. This location can be then elaborated and, with the use of LIDAR sensor, the robot can estimate which is the 3D position of the element tracked from the software.\\
 Finally, it moves to reach that position, in order to follow the tracked subject not only into the virtual space but also into the real environment.
 
 
 \section{The Problem}
 The thesis project is based on an internship with Dolomiti Robotics\cite{dolomitiRobotics}, a company working on self-driving robots.\\
-These vehicles are ideated to work in an industrial environment. In this scenario does not work only robots but also people, making the driving task even more complex to accomplish.
+These vehicles are designed to work in an industrial environment. This scenario is populated not only by robots but also people, making the driving task even more complex to achieve.
 
 \subsection{Robot only environment}
-A looking similar context is a completely automated environment, where humans cannot access. Instead, it is completely different because each vehicle has is its own logic that can be designed to fit the requirement of all the other robots working in that area.\\
+A completely automated environment, where humans cannot access looks to be a similar context. Instead, it is completely different because each vehicle has is its own logic that can be designed to fit the requirements of all the other robots working in that area.\\
 The typical solutions to drive a vehicle in this scenario are two:
 \begin{itemize}
-	\item Based on a centralized decision unit that moves all the robots simultaneously around. This unit is responsible to avoid collisions by knowing the exact position of each single moving robot
-	\item Based on fixed rules of movement that each robot has to respect. The rules do not allow collision and these are not violated from the vehicles
+	\item Based on a centralized decision unit that moves all the robots simultaneously around. This unit is responsible for avoiding collisions by knowing the exact position of each single moving robot.
+	\item Based on fixed rules of movement that each robot has to follow. The rules do not allow collision and the automated vehicles respect them.
 \end{itemize}
-Both these methods work because an automated vehicle uses a completed deterministic decision process and do not take arbitrary choices.
+Both these methods work because an automated vehicle uses a deterministic decision process and does not take arbitrary choices.
 
 \subsection{Environment shared between robots and humans}
-Instead, in a shared environment, there are a lot of elements that are not controlled by a deterministic rule. The changes in the scenario are random and no prediction can be done. There are both fixed object that may have changed position due to external interaction, and also human that walk around with no defined rules.\\
-In this scenario, in order to create an autonomous moving vehicle, it is fundamental to choose an input method that can measure all the area around. The LIDAR has been chosen. LIDAR is a technology that measures distances all around in a horizontal plane. The effect is that the robot knows in each direction which is the distance from the surrounding objects. This key idea has been used from Dolomiti Robotics, to design software able to drive robots around avoiding hit of fixed obstacles or people walking.\\
-While a robot moves around it can construct a map of the fixed object in the environment, measured with LIDAR. Instead, the moving object, such as other robots or people, that are recognised as not fixed elements are not stored in the map as obstacles. This reconstruction allows the vehicle to move autonomously from one position to another knowing exactly which path to follow to reach the destination.
+Instead, in a shared environment, there are a lot of elements that are not controlled by a deterministic rule. The changes in the scenario are random and prediction cannot be done. There are both fixed object that may have changed position due to external interaction, and also human that walk around with no defined rules.\\
+In this scenario, it is fundamental to choose an input method that can measure the area around, in order to create an autonomous moving vehicle. Therefore LIDAR has been chosen. LIDAR is a technology that measures distances around the robot in a horizontal plane. The effect is that the robot knows in each direction which is the distance from the surrounding objects. This key idea has been used from Dolomiti Robotics, to design a software able to drive robots around avoiding collision with fixed obstacles or people walking.\\
+While a robot moves around, it can construct a map of the fixed objects in the environment, measured with LIDAR. Instead, the moving objects, such as other robots or people, that are recognised as not fixed elements are not stored in the map as obstacles. This reconstruction allows the vehicle to move autonomously from one position to another knowing exactly which path to follow to reach the destination.
 
 \subsection{Purpose of the internship}
-The shared environment does not offer any real human-robot exchange. The two parts only share the same spaces. The goal of this thesis project is to create a real interaction between the two.\\
-Create a new functionality \textit{"that allows a robot to follow a person into the real environment"}.\\
-How does it work:
+The shared environment does not offer any real human-robot exchange. The two parts only share the same spaces. The purpose of this thesis project is to create a physical interaction between the two.\\
+The goal is to create a new functionality \textit{"that allows a robot to follow a person into the real environment"}. How it works:
 \begin{itemize}
-	\item Track/follow is the interaction of a robot and a single person (called from now on \textbf{Leader})
-	\item The leader starts the \textit{"follow"} functionality standing in front of the webcam of the robot
-	\item The robot has few seconds to recognise the person inside the camera \textbf{FOV (Field Of View)} as the leader
-	\item Then the leader can freely move around in the space. 
-	\item In the meanwhile the algorithm is processing the webcam stream of images recognising the position of the leader and start to track it in the virtual space, while following it in the real one.
-	\item The tracking continues for a long period, up to minutes. Until this functionality is stopped.
+	\item Track/follow is the interaction of a robot and a single person (called from now on \textbf{Leader}).
+	\item The Leader starts the \textit{"follow"} functionality standing in front of the webcam of the robot.
+	\item The robot has few seconds to recognise the person inside the camera \textbf{FOV (Field Of View)} as the Leader.
+	\item Then the Leader can freely move around in the space. 
+	\item In the meanwhile the algorithm is processing the webcam stream of images recognising the position of the Leader and start tracking it in the virtual space, while following it in the real one.
+	\item The tracking continues for a long period, up to minutes until this functionality is stopped.
 \end{itemize}
 
 \subsection{Technical problems}\label{sec:technicalProblems}
-This "follow" functionality may be easily solvable under certain conditions. But if the general scenario should be solved it is a much harder task.\\
-Below are listed a small collection of the principal problems that make this functionality an extremely general one, and so hard to solve.
+This "follow" functionality may be easily solved under certain conditions. However, solving the general scenario, it is a much harder task.\\
+Below is listed a small collection of the principal problems that make this functionality an extremely general one, therefore hard to solve.
 \begin{itemize}
-	\item The tracking should be done in real-time. It is impossible to follow a person if the processing speed is too slow.\\
-	      A high \textbf{FPS (Frames Per Second)} rate should be respected.
-	\item The robot needs to physically follow the person meaning that the webcam is not fixed.\\
-	      Due to this, also the background is not fixed and the entire captured image, subject included, might be blurred.
-	\item The person can move freely around walking fast, slow, or stay still
-	\item The leader is a random person, it is not known while the algorithm was designed (no parameters can be fixed in advance)
-	\item While the leader is walking around there might be also other people that create interference to the algorithm
-	\item The leader can be hidden from the webcam due to moving or static elements placed between the leader and the webcam itself
-	\item The leader can exit the field of view of the webcam disappearing until the robot rotates to view it back again	
-	\item The tracking should be performed for a long period
+	\item The tracking should be done in real-time. It is impossible to follow a person if the processing speed is too slow. A high \textbf{FPS (Frames Per Second)} rate should be respected.
+	\item The robot needs to physically follow the person meaning that the webcam cannot be fixed. By consequence, also the background is not fixed and the entire captured image, subject included, might be blurred.
+	\item The person can move freely around walking fast, slow, or staying.
+	\item The Leader is a random person, it is not known while the algorithm was designed (no parameters can be fixed in advance).
+	\item While the Leader is walking around there might be also other people that interfere with the algorithm.
+	\item The Leader can be hidden from the webcam due to moving or static elements placed between the Leader and the webcam itself.
+	\item The Leader can exit the field of view of the webcam disappearing until the robot rotates to watch it back again.
+	\item The tracking should be performed for a long period.
 \end{itemize}
 
 
 \section{The Solution}
-The problem is complex due to its generality and the necessity to cover a lot of complementary conditions. For this reason more than one solution exists. In this thesis is presented a solution based on the combination of other three. Each one is designed for solving sub problem respect to this one, and none of them alone can overcome the challenge of the general task.\\
+The problem is complex due to its generality and the necessity to cover a lot of complementary conditions. For this reason more than one solution exists. In this thesis is presented a solution based on the combination of three methods. Each one is designed to solve sub-problem compared to this one, and none of them alone can overcome the challenge of the general task.\\
 
 \subsection{Existing technologies}\label{sec:existingTechnologies}
 The three technologies are:
 \begin{itemize}
-	\item \textbf{Object Detection (or Localization):} given an image the object detection task aim to process the image and recognise which objects exist there. The detection not only need to produce a list of all the classes\footnote{There are a set of types to which each element can be associated i.e. person, dog, car, bicycle, bottle and so on.} of objects visible in the image, but also recognise in which section of the frame every single element is.\\
-	The output of detection is a list of: class to which the element belongs, the probability associated and the \textbf{BB (Bounding Box)} defined as the smaller rectangle that contains the entire element.
+	\item \textbf{Object Detection (or Localization):} given an image the object detection task aim at processing the image and recognise which objects exist there. The detection not only need to produce a list of all the classes\footnote{There are a set of types to which each element can be associated i.e. person, dog, car, bicycle, bottle and so on.} of objects visible in the image, but also recognise in which section of the frame every single element is.\\
+	The output of detection is a list of: class to which the element belongs, the probability associated and the \textbf{bounding box} defined as the smallest rectangle that contains the entire element.
 
 	\item \textbf{Object Tracking:} in this case the input is not a single image but a video stream and an initial section\footnote{A portion of the image: a rectangle.} of it. The goal is to remember this portion of the image and recognise it in all the frames after the first one. It is important to note that the tracking procedure it is not designed to follow a person, a car or other it is designed to follow a rectangle of coloured pixels, no matter what these pixels represent.
 
-	\item \textbf{Object Recognition:} this is a comparison between several pictures. These often represent a bounding box of the object that needs to be recognised. The procedure has a database of images each one with a specific class, and the input value is another picture, called \textbf{query}, that do not exist in the database but it represents a subject known. The goal is to extract from the database all the images that have a subject that looks similar to the one represented in the query.\\
-	This application is mainly used to recognise humans, often in the video surveillance context. The database is composed of the bounding box of all the person seen, i.e. in a supermarket during the last week, and when a thief is captured and it is used as a query. So, the system should return all the images containing the thief itself.
+	\item \textbf{Object Recognition:} this is a comparison between several pictures. These often represent a bounding box of the object that needs to be recognised. The procedure has a database of images each one with a specific class, and the input value is another picture, called \textbf{query}, that does not exist in the database but it represents a subject known. The goal is to extract from the database all the images that have a subject that looks similar to the one represented in the query.\\
+	This application is mainly used to recognise humans, often in the video surveillance context. The database is composed of the bounding box of all the people seen, i.e. in a supermarket over the last week, and when a thief is captured and it is used as a query. So, the system should return all the images containing the thief itself.
 \end{itemize}
 
 \subsection{Limitation of known technologies}
-The challenges presented previously in \Cref{sec:existingTechnologies}, can solve a small part of the general problem but each one has a technical problem\Cref{sec:technicalProblems} that cannot solve:
+The challenges presented previously in \Cref{sec:existingTechnologies}, can solve a small part of the general problem but each one has a technical problem~\Cref{sec:technicalProblems} that cannot be solved:
 \begin{itemize}
-	\item Object detection is a computationally expensive task, on a powerful GPU can run in real-time but that's not the case of the robots we are working with.\\
-	In addition, the detection works frame by frame and each one is independent of the previous one. So, if a person is recognised in a frame, and in the next one, there are also some people the algorithm knows nothing about the relation between the person in the first frame and the people in the next one. Meaning that a person cannot be tracked from one frame to the next one.
+	\item Object detection is a computationally expensive task, on a powerful GPU can run in real-time but that is not the case of the robots we are working with.\\
+	In addition, the detection works frame by frame and each one is independent of the previous one. So, if a person is recognised in a frame, and in the next one, there is more than a single person the algorithm does not know the relation between all of them. Meaning that a person cannot be tracked from one frame to the next one.
 
 	\item Object tracking, according to the name, seems the task that better match the requirement of the general problem.\\
-	Despite that, the tracking does not consider that the tracked subject, the leader, cannot be hidden from the webcam. The leader should always be visible into the recorded video, and that's not the case. In addition, the leader can also exit the field of view of the robot while walking around.\\
-	Lastly, all the tracker are designed to follow the subject for small periods\footnote{Each tracker works on a video of few seconds.}, after a while the tracked rectangle of coloured pixel change and the precision of the output is not guaranteed any more. This phenomenon is known as the \textbf{drift effect}, after a while the drift is so wide that the tracked cannot be trusted any more.
+	Despite that, the tracking does not consider that the tracked subject, the Leader, cannot be hidden from the webcam. The Leader should always be visible into the recorded video, and that is not the case. In addition, the Leader can also exit the field of view of the robot while walking around.\\
+	Lastly, all the trackers are designed to follow the subject for small periods\footnote{Each tracker works on a video of few seconds.}, after a while the tracked rectangle of coloured pixel changes and the precision of the output is no more not guaranteed. This phenomenon is known as the \textbf{drift effect}, after a while the drift is so wide that the tracked cannot be trusted anymore.
 
-	\item Object recognition due to its requirement was not designed at all to run in real-time. In fact, it is enough to run this procedure only when a query occurs, and that does not happen more than ones every second.\\
+	\item Object recognition due to its requirement was not designed at all to run in real-time. In fact, it is enough to run this procedure only when a query occurs, and that does not happen more than one every second.\\
 	Except that, there is a more intrinsic problem with the recognition to approach the general problem. The procedure requires a query that can be the subject at the actual frame, but then it should work on a dataset composed of old frames and these are useless to solve the actual frame.\\
-	In addition, this algorithm cannot be independent in fact, the input values are bounding box of the person, but these bounding box can be computed only with an object detection algorithm. So, this approach cannot solve the problem independently.
+	In addition, this algorithm cannot be independent, because the input values are bounding boxes of people, but these regions can be computed only with an object detection algorithm. Hence this approach cannot solve the problem independently.
 \end{itemize}
 
 This explanation shows that none of the existing proposed technologies can solve the general problem in all its parts.
 
 \subsection{Combine known methods to solve the general task}
 To solve the problem and manage all the requirements it is necessary to create a combination of known methods.\\
-An example of integration of methods to solve a complex task was done Jiang et al, in their paper\cite{multi-feature-fusion-and-YOLO} that present a fusion of \textbf{YOLO9000}\cite{yoloV2} (the second version of \textbf{YOLO}\cite{yolo}) used as object detector and \textbf{SURF}\cite{surf} used as short-term object tracker.\\
-The paper propose an innovative approach based on two thresholds that are used to understand when the drift of the tracker is too large and it is necessary to reinitialize it. So YOLO is executed to find the tracked subject back again and after the initialization the loop can start again.\\
+An example of integration of methods to solve a complex task was done by Jiang et al, in their paper\cite{multi-feature-fusion-and-YOLO} that presents a fusion of \textbf{YOLO9000}\cite{yoloV2} (the second version of \textbf{YOLO}\cite{yolo}) used as object detector and \textbf{SURF}\cite{surf} used as short-term object tracker.\\
+The paper illustrate an innovative approach based on two thresholds that are used to understand when the drift of the tracker is too large and it is necessary to reinitialize it. So YOLO is executed to find the tracked subject back again and after the initialization the loop can start again.\\
 \\
-The method presented in that paper is an integration of two class of methods. Instead in this thesis is presented an integration of three. The third method is necessary because an additional technical problem(\Cref{sec:technicalProblems}) exist. Jiang et al. work sport video clips where athletes are always followed by the camera and never disappear out of the field of view. In addition, occlusion can exist but are very short and the tracker is often able to overcome them.\\
-Instead, in our scenario we need  to manage the disappear of the leader behind a corner for a relative long time. So, the object recognition method was introduce to solve this condition.\\ 
-This are the main steps of the entire algorithm:
+The method presented in that paper is an integration of two class of methods. Instead in this thesis is presented an integration of three. The third method is necessary because an additional technical problem exists~(\Cref{sec:technicalProblems}). Jiang et al. work on sport video clips where athletes are always followed by the camera and never disappear out of the field of view. In addition, occlusion can exist but are very short and the tracker is often able to overcome them.\\
+Instead, in our scenario we need  to manage the disappearance of the Leader behind a corner for a relatively long time. So, the object recognition method was introduced to solve this condition.\\ 
+These are the main steps of the entire algorithm:
 \begin{enumerate}
-	\item The \underline{detection} is executed and the leader bounding box is found. For the moment assume, only one person detected in the frame, and it is the leader.
-	\item The \underline{tracker} is initialized with the bounding box found
-	\item The tracker run for the next F frames
-	\item A new detection is executed and D people are found
-	\item The \underline{person recognition} is used to choose if the leader is contained in the list of people found
+	\item The \underline{detection} is executed and the bounding box of the Leader is found. By assumptions, in this phase, if more than one person is simultaneously found the detections are ignored.
+	\item The \underline{tracker} is initialized with the bounding box found.
+	\item The tracker runs for the next F frames.
+	\item A new detection is executed and D people are found.
+	\item The \underline{person recognition} is used to choose if the Leader is contained in the list of people found:
 	\begin{itemize}
-		\item If \textbf{yes}: the procedure start again from point 2 (tracking)
-		\item If \textbf{not}: the procedure loop again from point 4 (detection again)
+		\item If \textbf{yes}: the procedure starts again from point 2 (tracking)
+		\item If \textbf{not}: the procedure loops again from point 4 (detection again)
 	\end{itemize}
 \end{enumerate}
 
-This flow shows how detection, tracking and recognition are combined together to build a complete algorithm, that can run in real-time due to the alternation of slow and fast methods and to manage all the problem scenarios.\\
+This flow shows how detection, tracking and recognition are combined together to build a complete algorithm, that can run in real-time due to the alternation of slow and fast methods and to manage all the problematic scenarios.\\
 The details will follow.
 
 \section{Structure of the thesis}
-The next chapters are organized as follow. This section conclude the introduction (\Cref{cha:introduction}).\\
+The next chapters are organized as follows. This section concludes the introduction (\Cref{cha:introduction}).\\
 Then follow three chapters one for each main method: object detection in~\Cref{cha:detection}, object tracking in~\Cref{cha:tracking} and object recognition in~\Cref{cha:recognition}.\\
 An overview of the entire algorithm and how it works together follow  in~\Cref{cha:solution}.\\
-In the end, the conclusion are presented in~\Cref{cha:conclusion}.
+In the end, the conclusions are presented in~\Cref{cha:conclusions}.
 
 
 

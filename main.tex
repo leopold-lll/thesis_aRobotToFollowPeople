@@ -5,12 +5,6 @@
 %
 % update 2015-09-10
 %
-% Per la generazione corretta del 
-% pdflatex nome_file.tex
-% bibtex nome_file.aux
-% pdflatex nome_file.tex
-% pdflatex nome_file.tex
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % formato FRONTE RETRO
@@ -24,24 +18,24 @@
 % Packeage added by me:
 \usepackage{hyperref}	%the reference are links and not only numbers
 %\usepackage[hidelinks]{hyperref} %usethis option to remove coloured rectangles around the reference (useful for print the PDF)
+%The rectagles of \Cref are automatically removed during the printing
 %NB: first we need to include hyperref and only after cleverref
 \usepackage{cleveref}	%allow the use of \Cref to refer to elements
 \usepackage{changepage}	%allow to locally modify the margins (i.e. in the front page)
 \usepackage{tcolorbox} 	%allow to create rectangle to highlight text
 \usepackage{pifont}		%allow to use extra characters
 \usepackage[shortlabels]{enumitem}  %enumerate with letters
+\usepackage{listings}	%package for code into the text
 
 %useful for side by side images display
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
 
-
 %new commands
-\newcommand{\bb}[0]{bounding box}
+%\newcommand{\bb}[0]{bounding box}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% supporto lettere accentate
 % 
 % NB: non so perchè ma anche essendo su windows il pacchetto per windows non funziona, bisogna utilizzare quello di linux per non avere errori...
 %\usepackage[latin1]{inputenc} % per Windows; 
@@ -49,37 +43,13 @@
 %\usepackage[applemac]{inputenc} % per Mac.
 
 \singlespacing
-
 %\usepackage[italian]{babel}
 
-\begin{document}
-
-  % nessuna numerazione
-  \pagenumbering{gobble} 
-  \input{0-frontespizio}
-
-  \clearpage
- 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Nota
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Sezione Ringraziamenti opzionale
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \input{0-ringraziamenti}
-  \clearpage
-  %\pagestyle{plain} % nessuna intestazione e pie pagina con numero al centro
-
-  
-  % inizio numerazione pagine in numeri arabi
-  \mainmatter
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Nota
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Si ricorda che il numero massimo di facciate e' 30.
+%% Si ricorda che il numero massimo di facciate è 30 per tesi triennale e +inf per tesi magistrale,
 %% Nel conteggio delle facciate sono incluse 
 %%   indice
 %%   sommario
@@ -88,106 +58,123 @@
 %%   frontespizio
 %%   ringraziamenti
 %%   allegati    
+%%	 bibliografia
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    % indice
-    \tableofcontents
-    \clearpage
-    
-          
-    % gruppo per definizone di successione capitoli senza interruzione di pagina
-    \begingroup
-      % nessuna interruzione di pagina tra capitoli
-      % ridefinizione dei comandi di clear page
-      %\renewcommand{\cleardoublepage}{} %no text in this page
-      %\renewcommand{\clearpage}{} %no text until next odd page
-      % redefinizione del formato del titolo del capitolo
-      % da formato
-      %   Capitolo X
-      %   Titolo capitolo
-      % a formato
-      %   X   Titolo capitolo
-      
-      \titleformat{\chapter}
-        {\normalfont\Huge\bfseries}{\thechapter}{1em}{}
-        
-      \titlespacing*{\chapter}{0pt}{0.59in}{0.02in}
-      \titlespacing*{\section}{0pt}{0.20in}{0.02in}
-      \titlespacing*{\subsection}{0pt}{0.10in}{0.02in}
-      
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Nota
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Sommario e' un breve riassunto del lavoro svolto dove si descrive 
-%% l’obiettivo, l’oggetto della tesi, le metodologie e 
-%% le tecniche usate, i dati elaborati e la spiegazione delle conclusioni 
-%% alle quali siete arrivati.
-%% Il sommario dell’elaborato consiste al massimo di 3 pagine e deve contenere le seguenti informazioni: 
-%%   contesto e motivazioni
-%%   breve riassunto del problema affrontato
-%%   tecniche utilizzate e/o sviluppate
-%%   risultati raggiunti, sottolineando il contributo personale del laureando/a
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      % lista dei capitoli
-      %
-      % \input oppure \include
-      %
-      \input{0-acronyms}
-      \input{1-summary}		\clearpage
-      \input{2-introduction}\clearpage
-      \input{3-detection} 	\clearpage
-      \input{4-tracking} 	\clearpage
-      \input{5-recognition} \clearpage
-      \input{6-solution} 	\clearpage
-      \input{7-conclusion} \clearpage
-      
+% latex colors (use only the first word): https://static.javatpoint.com/tutorial/latex/images/latex-colors.png
+\lstset{
+	breakatwhitespace=false,         
+	breaklines=true,     
+	basicstyle=\small\ttfamily,
+	frame=single, 				%border of the code           
+	commentstyle=\color{teal}, %Indica il colore dei commenti
+	language=Python, 			%Indica il linguaggio predefinito da usare
+	rulecolor=\color{black}, 	%Indica il colore dei numeri di righe
+	,
+	numbers=left,				%Numerazione di pagina
+	xleftmargin=2em,
+	frame=single,
+	framexleftmargin=2em
+	,	
+	tabsize=4,
+	escapeinside={\%*}{*)},
+	keywordstyle = {\color{blue}},        	%language functions
+	keywordstyle = [2]{\color{darkgray}},   %custom functions 
+	keywordstyle = [3]{\color{olive}},    	%variables
+	keywordstyle = [4]{\color{purple}},   	%for variables
+	otherkeywords= {language_functions}, 	%addition keywords to the normal syntax
+	morekeywords = [2]{custom_functions}, 
+	morekeywords = [3]{variables},
+	morekeywords = [4]{for_variables}
+}
+
+\begin{document}
+
+	\pagenumbering{gobble}% nessuna numerazione
+	%\pagestyle{plain} 	% nessuna intestazione e pie pagina con numero al centro
+	
+	\input{0-frontpage}
+	\clearpage
+	
+	\input{0-ringraziamenti}
+	\clearpage
+		
+	\mainmatter			% inizio numerazione pagine in numeri arabi
+
+	% indice
+	\tableofcontents
+	\clearpage
+	      
+	% gruppo per definizone di successione capitoli senza interruzione di pagina
+	\begingroup
+		% nessuna interruzione di pagina tra capitoli
+		% ridefinizione dei comandi di clear page
+		%\renewcommand{\cleardoublepage}{} %no text in this page
+		%\renewcommand{\clearpage}{} %no text until next odd page
+		% redefinizione del formato del titolo del capitolo
+		% da formato
+		%   Capitolo X
+		%   Titolo capitolo
+		% a formato
+		%   X   Titolo capitolo
+		
+		\titleformat{\chapter}
+			{\normalfont\Huge\bfseries}{\thechapter}{1em}{}
+		
+		\titlespacing*{\chapter}{0pt}{0.59in}{0.02in}
+		\titlespacing*{\section}{0pt}{0.20in}{0.02in}
+		\titlespacing*{\subsection}{0pt}{0.10in}{0.02in}
+		
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		% lista dei capitoli
+		%
+		% \input oppure \include
+		%
+		\input{0-acronyms}		\clearpage
+		\input{1-summary}		\clearpage
+		\input{2-introduction}	\clearpage
+		\input{3-detection}		\clearpage
+		\input{4-tracking}		\clearpage
+		\input{5-recognition}	\clearpage
+		\input{6-solution}		\clearpage
+		\input{7-conclusions}	\clearpage
       
     \endgroup
 
     % bibliografia in formato bibtex
-    %
-    % aggiunta del capitolo nell'indice
     \phantomsection
-    \addcontentsline{toc}{chapter}{Bibliography}
-    % stile con ordinamento alfabetico in funzione degli autori
-    \bibliographystyle{unsrt}
+    \addcontentsline{toc}{chapter}{Bibliography}	% aggiunta del capitolo nell'indice
+    \bibliographystyle{unsrt}						% stile con ordinamento alfabetico in funzione degli autori
     \bibliography{biblio}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Nota
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Nella bibliografia devono essere riportati tutte le fonti consultate 
-%% per lo svolgimento della tesi. La bibliografia deve essere redatta 
-%% in ordine alfabetico sul cognome del primo autore. 
-%% 
-%% La forma della citazione bibliografica va inserita secondo la fonte utilizzata:
-%% 
-%% LIBRI
-%% Cognome e iniziale del nome autore/autori, la data di edizione, titolo, casa editrice, eventuale numero dell’edizione. 
-%% 
-%% ARTICOLI DI RIVISTA
-%% Cognome e iniziale del nome autore/autori, titolo articolo, titolo rivista, volume, numero, numero di pagine.
-%% 
-%% ARTICOLI DI CONFERENZA
-%% Cognome e iniziale del nome autore/autori (anno), titolo articolo, titolo conferenza, luogo della conferenza (città e paese), date della conferenza, numero di pagine. 
-%% 
-%% SITOGRAFIA
-%% La sitografia contiene un elenco di indirizzi Web consultati e disposti in ordine alfabetico. 
-%% E’ necessario:
-%%   Copiare la URL (l’indirizzo web) specifica della pagina consultata
-%%   Se disponibile, indicare il cognome e nome dell’autore, il titolo ed eventuale sottotitolo del testo
-%%   Se disponibile, inserire la data di ultima consultazione della risorsa (gg/mm/aaaa).    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%% Nota
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%% Nella bibliografia devono essere riportati tutte le fonti consultate 
+	%% per lo svolgimento della tesi. La bibliografia deve essere redatta 
+	%% in ordine alfabetico sul cognome del primo autore. 
+	%% 
+	%% La forma della citazione bibliografica va inserita secondo la fonte utilizzata:
+	%% 
+	%% LIBRI
+	%% Cognome e iniziale del nome autore/autori, la data di edizione, titolo, casa editrice, eventuale numero dell’edizione. 
+	%% 
+	%% ARTICOLI DI RIVISTA
+	%% Cognome e iniziale del nome autore/autori, titolo articolo, titolo rivista, volume, numero, numero di pagine.
+	%% 
+	%% ARTICOLI DI CONFERENZA
+	%% Cognome e iniziale del nome autore/autori (anno), titolo articolo, titolo conferenza, luogo della conferenza (città e paese), date della conferenza, numero di pagine. 
+	%% 
+	%% SITOGRAFIA
+	%% La sitografia contiene un elenco di indirizzi Web consultati e disposti in ordine alfabetico. 
+	%% È necessario:
+	%%   Copiare la URL (l’indirizzo web) specifica della pagina consultata
+	%%   Se disponibile, indicare il cognome e nome dell’autore, il titolo ed eventuale sottotitolo del testo
+	%%   Se disponibile, inserire la data di ultima consultazione della risorsa (gg/mm/aaaa).    
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-
-    %\titleformat{\chapter}
-    %    {\normalfont\Huge\bfseries}{Allegato \thechapter}{1em}{}
     % sezione Allegati - opzionale
 	%\appendix
     %\input{allegati}

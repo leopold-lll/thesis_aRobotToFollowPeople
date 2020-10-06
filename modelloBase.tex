@@ -4,15 +4,16 @@
 \section{reference samples}
 \label{sec:refSamples}
 
-\begin{figure}[!h]
+\begin{figure}[!h] %simple figure
 	\centering
 	%or \columnwidth
 	\includegraphics[width=0.3\linewidth]{images/ex1_yolo} %.jpg is useless
+	\captionsetup{margin=0.5cm}	%margin from captions
 	\caption{Object detection applied on a sample image.}
 	\label{fig:sampleYolo}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[h]	%simple table
 	\centering
 	\begin{tabular}{ll|l|ll}
 		\cline{1-4}
@@ -26,7 +27,7 @@
 \end{table}
 
 Try to cite different elements\footnote{Not only reference but also footnote ;)}:
-\begin{itemize}
+\begin{itemize}		%bullet point
 	\item images show at: \Cref{fig:peoplePair}\\
 		  more complex images can be found at: \href{https://tex.stackexchange.com/questions/37581/latex-figures-side-by-side}{side by side images}
 	\item look at \Cref{tab:sampleTable}\\
@@ -36,3 +37,39 @@ Try to cite different elements\footnote{Not only reference but also footnote ;)}
 	\item yolov3 \cite{yoloV3}
 \end{itemize}
 
+\begin{tcolorbox}	%text area
+	\begin{center}
+		Nice text area :D
+	\end{center}
+\end{tcolorbox}
+
+\begin{figure}		%an image with sub-images
+	\centering
+	\begin{minipage}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{images/ex1_yolo}
+		\captionof{figure}[shortcut for list of figure]{Description 1.}
+		\label{fig:qqq}
+	\end{minipage}
+	\begin{minipage}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{images/ex1_yolo}
+		\captionsetup{margin=0.5cm}
+		\captionof{figure}{Description 2}
+		\label{fig:bbb}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}		%two separate images side by side
+	\centering
+	\begin{minipage}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{images/ex1_yolo}
+		\captionof{figure}{image description 1}
+	\end{minipage}
+	\begin{minipage}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{images/ex1_yolo}
+		\captionof{figure}{image description 2}
+	\end{minipage}
+\end{figure}

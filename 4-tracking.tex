@@ -2,7 +2,6 @@
 This chapter is focused on a few methods that solve the traditional task of object tracking. For each algorithm the potentiality is shown and the advantages, compared to other methods, will be discussed. In addition, an overview of similar problems is given in~\Cref{sec:tracking-conditions}.
 
 
-
 \section{Task definition} \label{sec:tracking-definition}
 Object tracking is a challenge that, differently from the detection, does not work with images but deal with videos. A video is technically defined as a sequence of images, called \textbf{frames}, combined together at a certain frame rate. Typically this rate is 15, 30 or 60 FPS (Frames Per Second).\\
 The interconnection of the frames of videos is used from the object tracker algorithms to create knowledge, based on the previously analysed images, by storing information. An object detector elaborates a picture at a time, each one independently from the other. There is no connection among images of the same database. Instead, a tracker process images one at a time but it uses the knowledge, of the previously analysed frames, to understand the current incoming image.\\
@@ -166,7 +165,7 @@ Some of the aspects explained in the previous section are extremely frequent in 
 
 	\item The requirements for this thesis, except the traditional ones, are:
 	\begin{itemize}
-		\item Long-time occlusion. In our scenario where the robot physically follows a person, the leader can disappear behind a corner and will be hidden as long as the robot reaches it.
+		\item Long-time occlusion. In our scenario where the robot physically follows a person, the Leader can disappear behind a corner and will be hidden as long as the robot reaches it.
 		\item Real-time processing. We have decided that to understand the movements in the real environment is sufficient a processing speed of 5 FPS.
 		\item Long-term video. The algorithm is designed to last for a very long period, no explicit bounds exist since the drift problem has been solved.
 		\item Subject limited to people. We are not interested in following animals or vehicles, even if extending the algorithm to them only require to change the object detectors setup and the internal database of images to train the recognition procedure.
