@@ -1,3 +1,117 @@
 \chapter{Solution} \label{cha:solution}
+This chapter is focused on the integration of the three modules of this thesis: detection, recognition and tracking. The explanation is based on the flow of the code, with special attention at the choices done and implementation details. The source code of the entire project is available on github\cite{projectSourceCode}.
+
+\section{Wrapper function: follow} \label{sec:follow}
+The code is entirely managed with a single class called \textbf{Follower}. This structure only requires to be initialized and then calling a "\textit{follow}" method (\Cref{alg:follow}) every time a new frame needs to be processed.\\
+The class internally loads a new frame \li{2} from the webcam or, optionally, from a stored video. Both the sources can be used in "real-time". In fact, if the video is used some frames are internally discarded to simulate the losing of images due to a slow processing rate. Therefore the class \textit{Follower} can be analysed with both real-time tests but also recorded experiments. This feature is useful to replicate scenarios where the code have failed.\\
+\\
+The wrapper method \textit{follow} has only one task. It measures the elapsed time from the beginning of the tracking \li{4} and, according to this parameter, the \textit{slow start} phase (\Cref{sec:slowStartPhase}) is executed \li{5}  if less than X seconds are gone. Otherwise, the \textit{track leader} phase (\Cref{sec:trackLeaderPhase}) is called \li{7}.
+
+\begin{lstlisting}[captionpos=b, 
+	caption={It is the pseudocode of the wrapper function that should grab the new incoming frames and redirect them to the first or second phase according to the time elapsed from the tracking begin.}, 
+	label=alg:follow
+	]
+follow() -> position:
+	frame = grab_newFrame()
+	
+	if elapsedTime() > phase1_length: #phase 1
+	%*$\lfloor$*)	position = slowStartPhase(frame)
+	else:							  #phase 2
+	%*$\lfloor$*)	position = followPhase(frame)
+
+	return position
+\end{lstlisting}
 
 
+\section{First phase: slow start} \label{sec:slowStartPhase}
+This function is a novelty that we have chosen to introduce to empower the performances of the overall algorithm. The pseudo code of this method is provided at~\Cref{alg:slowStartPhase}.\\
+This project, differently from the traditional trackers and similarly to TLD (\Cref{sec:tld}), is based on an online learning classifier. Hence this phase is designed to immediately train KNN a little bit. This first generated knowledge will be then increased in the \textit{track leader} phase. KNN can classify the representative points that come from the bounding boxes of people in new frames, only according to other representative points previously archived. The \textit{slow start} phase is used to collect all the bounding boxes used to create the set of positive representative points into the N-dimensional space of KNN.\\
+This elaboration works based on the assumption that during this first phase "\ul{The Leader is the only visible person}". The \textit{slow start} computes the detection of the visible people \li{3} and if only one exists, it is the Leader \li{5-6}. The X and Y pixel coordinates are computed to be retrieved \li{7} and the Leader's box is given to KNN \li{8}. Simultaneously, a negative sample is randomly picked up from a database and it is also given to KNN \li{9}. This double fed is done to train KNN with a balanced number of positive and negative samples, in order to exploit the potentialities shown in~\Cref{fig:knn_googleNet_s9n18}. The negative samples come from a custom version of the Market1501 dataset\cite{market1501}, called \textbf{NegativePeople}, that we have created ad hoc for this purpose.\\
+Note that the baseline assumption can be easily extended to: "\ul{The Leader is the most important visible person}". The importance could be given by the measure of the surface of the bounding box. This modification will manage small people in the background that are not important. At the moment this case is not managed \li{12} but it can be a future improvement.\\
+\\
+The \textit{slow start} phase is executed for a period that can last for 3 up to 20 seconds or more. The value of this hyper-parameter influence the size of samples known by KNN when the official track starts. The longer this phase the better. The default value is set to 5 seconds. Alternatively, another possibility is that the first phase can be interrupted after that X points are given to KNN, but this does not guarantee a precise slot of time so this variant was discarded.
+
+\begin{lstlisting}[captionpos=b, 
+	caption={It is the pseudocode of the first phase. The function \textit{slow start} computes only detections in order to train the KNN people classifier.}, 
+	label=alg:slowStartPhase
+	]
+slowStartPhase(frame) -> position:
+	position = default
+	boxes = detector.detectPeople(frame)
+	
+	if len(boxes)==1:
+	%*$\mid$*)	box = boxes[0]	#positive sample
+	%*$\mid$*)	position = getPosition(box)
+	%*$\mid$*)	knn.addPositive(box)
+	%*$\mid$*)	knn.addNegative(pickOneNegative())
+	%*$\lfloor$*)
+	else:
+	%*$\lfloor$*)	# future improvements will manage ad hoc solutions
+
+	return position
+\end{lstlisting}
+
+
+\section{Second phase: track leader} \label{sec:trackLeaderPhase}
+This function is the core of the entire project. The overall scheme of the pseudocode is shown at~\Cref{alg:trackLeaderPhase}. It works as follows:\\
+\begin{itemize}
+	\item The detection is performed \li{7} only one time every X frames \li{5}(details in~\Cref{sec:ratioDetectTrack}) and if the position of the Leader is unknown \li{6}.\\
+	The position is unknown immediately after the \textit{slow start} phase \li{2}, after the end of the tracking \li{29} and after a failed detection \li{17}.
+	
+	\item All the detections are elaborated \li{10} to check if are close to the last known position \li{11} and so can be kept or not (the optimization details are in~\Cref{sec:driftOptimization}). In addition, the KNN classifier is used \li{12} to accurately understood which detections contain the Leader and which not (errors tolerance explained in~\Cref{sec:knnToleranceToFN}).\\
+	Then, the false predictions are added to KNN \li{15}, while the positive ones are stored for more controls \li{13}.
+	
+	\item All the boxes that seem to contain the Leader are further analysed \li{17-18}. The official prediction is chosen as the closest feasible box to the last known position \li{19} (more details in~\Cref{sec:multipleLeaders}). Based on this final choice the tracked is re-initialized \li{20}.
+	
+	\item The new position is computed \li{22} and the elaborated bounding boxes are stored into KNN according to their content \li{23-24}. If only one detection was initially found \li{25}, and it was the Leader, KNN is fed with a negative sample \li{26} coming from the NegativePeople dataset.
+	
+	\item After the initialization, the tracking is updated with new frames, one at a time \li{30}. The retrieved bounding box once converted into a position \li{31} is returned to the \textit{follow} function, both for detection and tracking \li{33}.
+\end{itemize}
+Special conditions and key aspects to focus on, follow in the next sections.
+
+\begin{lstlisting}[captionpos=b, 
+	caption={It is the pseudocode of the second phase. The function \textit{track leader} alternatively run the detection and tracking modules to constantly knows the position of the Leader.}, 
+	label=alg:trackLeaderPhase
+	]
+trackLeaderPhase(frame) -> position:
+	static stopDetections = False
+	position = default
+	
+	if onceEveryKTimes(10) 
+	%*$\mid$*)  and not stopDetections: 					 #detection
+	%*$\mid$*)	boxes = detector.detectPeople(frame)
+	%*$\mid$*)	
+	%*$\mid$*)	boxesOfLeader = []
+	%*$\mid$*)	foreach box in boxes:
+	%*$\mid$*)	%*$\mid$*)	if checkDriftProximity(box)	  #drift optimization
+	%*$\mid$*)	%*$\mid$*)	%*$\mid$*)   and knn.classify(box)==positive: #recognition
+	%*$\mid$*)	%*$\mid$*)	%*$\lfloor$*)	 boxesOfLeader.add(box)
+	%*$\mid$*)	%*$\mid$*)	else:
+	%*$\mid$*)	%*$\lfloor$*)	%*$\lfloor$*)	knn.addNegative(box)
+	%*$\mid$*)			
+	%*$\mid$*)	stopDetections = (len(boxesOfLeader) > 0)
+	%*$\mid$*)	if stopDetections:
+	%*$\mid$*)	%*$\mid$*)	boxOfLeader = pickClosestPosition(boxesOfLeader) 
+	%*$\mid$*)	%*$\mid$*)	tracker.initialize(frame, boxOfLeader)
+	%*$\mid$*)	%*$\mid$*)	
+	%*$\mid$*)	%*$\mid$*)	position = getPosition(boxOfLeader)
+	%*$\mid$*)	%*$\mid$*)	knn.addPositive(boxOfLeader)			 
+	%*$\mid$*)	%*$\mid$*)	knn.addNegative(boxesOfLeader except boxOfLeader)
+	%*$\mid$*)	%*$\mid$*)	if len(boxes) == 1:
+	%*$\mid$*)	%*$\lfloor$*)	%*$\lfloor$*)	knn.addNegative(pickOneNegative())
+	%*$\lfloor$*)		
+	else: 										 #tracking
+	%*$\mid$*)	stopDetections = False
+	%*$\mid$*)	box = tracker.updateRegion(frame)
+	%*$\lfloor$*)	position = getPosition(box)
+	
+	return position
+\end{lstlisting}
+
+\subsection{Detection and tracking ratio} \label{sec:ratioDetectTrack}
+\subsection{Multiple leaders corner case} \label{sec:multipleLeaders}
+\subsection{Drift tolerance optimization} \label{sec:driftOptimization}
+\subsection{Wrong prediction tolerance in people recognition} \label{sec:knnToleranceToFN}
+aggiungere immagini di shelfy per funzione 1 e 2\\
+initialization of the DNNs require a little bit + detection is the slowest module of the three\\
+overall measure of FPS.

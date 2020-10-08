@@ -24,8 +24,8 @@
 \usepackage{changepage}	%allow to locally modify the margins (i.e. in the front page)
 \usepackage{tcolorbox} 	%allow to create rectangle to highlight text
 \usepackage{pifont}		%allow to use extra characters
+\usepackage{soul}		%allow the underlined text to go to a new line
 \usepackage[shortlabels]{enumitem}  %enumerate with letters
-\usepackage{listings}	%package for code into the text
 
 %useful for side by side images display
 \usepackage{graphicx}
@@ -33,7 +33,6 @@
 \usepackage{subcaption}
 
 %new commands
-%\newcommand{\bb}[0]{bounding box}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
@@ -62,7 +61,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\li}[1]{\textit{(line {#1})}} %custom command to quote the pseudocode lines in the text.
+\usepackage{listings}	%package for code into the text
+\renewcommand{\lstlistingname}{Algorithm}	% change the caption   of the pseudo code from Listing to Algorithm
+\Crefname{lstlisting}{Algorithm}{}			% change the reference to the pseudo code from Listing to Algorithm
 % latex colors (use only the first word): https://static.javatpoint.com/tutorial/latex/images/latex-colors.png
+% code vertical lines: %*$\mid$*) and %*$\lfloor$*)
 \lstset{
 	breakatwhitespace=false,         
 	breaklines=true,     

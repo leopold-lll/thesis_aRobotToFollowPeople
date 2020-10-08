@@ -299,7 +299,7 @@ Then, both squared images are processed with two independent stacks of convoluti
 	\end{minipage}
 \end{figure}
 
-\subsection{TLD (Tracking-Learning-Detection)}
+\subsection{TLD (Tracking-Learning-Detection)} \label{sec:tld}
 Differently from all the other methods, TLD\cite{tld} aims to be a complete tracker able to deal with extremely complex scenarios. If the previously presented trackers have no chance to manage a long-time total occlusion and a long-term tracking, this method is able to overcome both of the problems. A sample showing potentiality is in the~\Cref{fig:sample_TLD}.\\
 The foundation principle is that TLD is not a single algorithm but it is a combination of three. The interaction of these three parts is shown in~\Cref{fig:howItWorks_TLD}. The key idea to overcome the re-identification problem that occurs after a total occlusion, or the drift problem that happens along a large video, is to often re-initialize the tracker. In fact, the \underline{tracking} (\textbf{T}) of TLD aims at managing short-term video clips. When a small problem occurs the \underline{detection} (\textbf{D}) tries to locate the subject back again. While these two situations take turns, the \underline{learning} procedure (\textbf{L}) extracts the key elements that recognise uniquely the subject and understand how to precisely locate it inside the frame.\\
 \\
@@ -327,7 +327,7 @@ The requirement is to solve the baseline tracking task (\Cref{sec:tracking-defin
 	\item \underline{\textbf{MOSSE}} is focused on pure speed. It is not the most reliable method but it can be a good choice to try to reach the highest FPS rate for the general challenge.
 	\item \underline{\textbf{GOTURN}} is a reliable method, running at a good FPS rate. At the moment it is not integrated in this project but it can be a great choice for future improvements.
 	\item \textbf{TLD} is a too complex method. It is able to solve long total occlusions but easily fails on simpler scenarios, by proposing a lot of false positives. It is not reliable at all for our purpose.\\
-	TLD is based on a principle that is similar to the one proposed in this thesis. The integration of tracking and detection linked together with a third procedure: learning in case of TLD and person recognition for this project. Both algorithms aim at solving the total occlusion problem and the drift problem with a reinitialization of the tracker performed with an object detector. The key difference is the existence in this thesis of the slow start phase presented in Section??? TODO.
+	TLD is based on a principle that is similar to the one proposed in this thesis. The integration of tracking and detection linked together with a third procedure: learning in case of TLD and person recognition for this project. Both algorithms aim at solving the total occlusion problem and the drift problem with a reinitialization of the tracker performed with an object detector. The key difference is the existence in this thesis of the \textit{slow start} phase presented in~\Cref{sec:slowStartPhase}.
 \end{itemize}
 
 \begin{table}[]
