@@ -2,14 +2,14 @@
 The goal of this chapter is to shows which types of techniques could be used to understand, given two images of a human, if the represented person is the same or not.
 
 \section{Problem definition}
-The \textbf{people recognition module}, also known as the \textbf{people identifier module}, overall the entire project as the role of connecting in a consistent way the two remaining modules, the detector and the tracker. The tracker works for the majority of the time, following the \textbf{main subject}, called \textbf{Leader}. Then, when it fails or after a certain amout of time, the detector locates all the people in the incoming frame. Finally, the recognizer has to answer a simple question:
+The \textbf{people recognition module}, also known as the \textbf{people identifier module}, overall the entire project as the role of connecting in a consistent way the two remaining modules, the detector and the tracker. The tracker works for the majority of the time, following the \textbf{main subject}, called \textbf{leader}. Then, when it fails or after a certain amout of time, the detector locates all the people in the incoming frame. Finally, the recognizer has to answer a simple question:
 \begin{tcolorbox}
 	\begin{center}
-		\underline{\textit{Is this person the Leader?}}\\
+		\underline{\textit{Is this person the leader?}}\\
 		Formally, given an image, cropped on the bounding box of a person, and a set of other images, with the same characteristics, containing various people labelled with names. Choose which is the name of the unknown person.
 	\end{center}
 \end{tcolorbox}
-In our specific scenario, we are interested only into understanding if a bounding box contains a representation of the Leader or not. For this reason the label can be considered with only two values: "\textit{positive}" or "\textit{negative}", "\textit{Leader}" or "\textit{other}".\\
+In our specific scenario, we are interested only into understanding if a bounding box contains a representation of the leader or not. For this reason the label can be considered with only two values: "\textit{positive}" or "\textit{negative}", "\textit{leader}" or "\textit{other}".\\
 
 \subsection{Video surveillance application}
 This challenge is extremely important in the video surveillance field. In fact, one of the most common application is to reconstruct where a person was seen during a certain time slot. The video surveillance application is a little bit different from the one in which we are interested:
@@ -22,13 +22,13 @@ From a high-level point of view, the two problems might look different but essen
 Another difference comes from the acquisition of images. In our scenario, the webcam is mounted on the robot that is moving around, while in video surveillance the cameras are often static but multiple of them can simultaneously collect frames. We took inspiration from both single-camera scenarios\cite{reID_withSSN} and multi-camera systems\cite{multiFeatures_reID}.
 
 
-\section{Not working methods}
+\section{Explored methods with low performances}
 This section is focused on some unsuccessful technique was explored during the development of the general structure for the project.
 
 \subsection{Offline algorithms}
 An offline algorithm (explained in~\Cref{sec:goturn}) is a great choice for training methods able to judge situations quickly. In this case, we have considered an \textbf{SVM (Support Vector Machine) classifier}.\\
 This method is a supervised learning model based on a linear separator. The essential idea is to find the line\footnote{A line in 2D problems, that is converted into a hyperplane in N-dimensional scenarios.} that divide the dataset into two sections where respectively the two classes of interest lie (a visual representation is given in~\Cref{fig:howItWorks_svm}). The method could work if each image of a person is converted into a point, as explained in~\Cref{sec:classifiers}.\\
-But this approach has a ground truth problem. The offline methods require prior knowledge of the context of application to train ad hoc models. In our case, the element to know is "\textit{Who is the Leader?}". Based on this information the dataset can be split into two classes, the images representing the Leader and the other ones, then the SVM classifier can be trained. The result is a model that always recognise one person, exactly the same person all the times.\\
+But this approach has a ground truth problem. The offline methods require prior knowledge of the context of application to train ad hoc models. In our case, the element to know is "\textit{Who is the leader?}". Based on this information the dataset can be split into two classes, the images representing the leader and the other ones, then the SVM classifier can be trained. The result is a model that always recognise one person, exactly the same person all the times.\\
 Unluckily, this prior knowledge is not given. The algorithm should recognise all types of people after seeing them for a few seconds. This is the context where an online algorithm can be wisely used.
 \begin{figure}
 	\centering
@@ -232,7 +232,7 @@ A couple of the results of the experiments are shown in~\Cref{fig:knn_reID_examp
 \\
 It is important to focus on the ratio between correct and wrong responses, green and red respectively. In the test elaborated with ResNet50 (\Cref{fig:knn_resNet_s9n99}) there are almost 50\% and 50\% of wrong and correct responses, while in the test elaborated with GoogLeNet (\Cref{fig:knn_googleNet_s9n18}) there is only one false prediction over $14$. Despite the different algorithms used the results is independent of them.\\
 In fact, the key difference is that in~\Cref{fig:knn_resNet_s9n99} there are 11 classes, so $9*1=9$ samples of the correct person and $9*10=90$ of the wrong one. While in~\Cref{fig:knn_googleNet_s9n18} there are only 2 classes so $9$ samples against $9$. This different ratio between positive and negative training examples affect the result of the predictions.\\
-In this thesis, we are dealing only with $2$ classes: the Leader and the other people. Hence, we are interested in the scenario with $18$ images that works extremely well.\\
+In this thesis, we are dealing only with $2$ classes: the leader and the other people. Hence, we are interested in the scenario with $18$ images that works extremely well.\\
 \\
 Lastly, for the integration of person recognition, with the tracking and detection modules, we only need to know if the query belongs to a class or to another one. This choice is based on the most likely class on the first K\footnote{In case of 2 classes K is often chosen odd.}  nearest neighbours of the query, so if the majority is green or red.
 

@@ -23,7 +23,7 @@ Structure of the tracking algorithms interface:
 \end{itemize}
 
 
-\subsection{Subject of the tracking}
+\subsection{Scope of the tracking}
 It is important to note that the task is called "\textit{Object tracking}" and not "\textit{Person tracking}" this is because there are no limitations to the subject that needs to be tracked, it does not necessarily need to be a human. A better name for the challenge could be "\textit{Area tracking}" because the algorithms should follow the rectangle of coloured pixels that was located in the initial bounding box. No assumption can be done of which type of subject exists inside the bounding box.\\
 Generally, these methods work if the initial position is centred around an object that moves consistently in the space and does not change aspect. Some examples that could break these methods are:
 \begin{itemize}
@@ -165,7 +165,7 @@ Some of the aspects explained in the previous section are extremely frequent in 
 
 	\item The requirements for this thesis, except the traditional ones, are:
 	\begin{itemize}
-		\item Long-time occlusion. In our scenario where the robot physically follows a person, the Leader can disappear behind a corner and will be hidden as long as the robot reaches it.
+		\item Long-time occlusion. In our scenario where the robot physically follows a person, the leader can disappear behind a corner and will be hidden as long as the robot reaches it.
 		\item Real-time processing. We have decided that to understand the movements in the real environment is sufficient a processing speed of 5 FPS.
 		\item Long-term video. The algorithm is designed to last for a very long period, no explicit bounds exist since the drift problem has been solved.
 		\item Subject limited to people. We are not interested in following animals or vehicles, even if extending the algorithm to them only require to change the object detectors setup and the internal database of images to train the recognition procedure.
