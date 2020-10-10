@@ -1,0 +1,307 @@
+\chapter{Object Detection} \label{cha:detection}
+This chapter explains into details what is the object detection task and the methods that can solve it efficiently. Moreover an overview of other methods is given among whose there not efficient ones and others that may seem to solve the task but do not.
+
+\section{Task definition}
+Object detection, also known as \textbf{object localization}, is an evolution of the \textbf{image classification} (\Cref{fig:imgAnalysisType}). In classification, an algorithm should produce a list of all the classes of objects inside the image. Instead, the detection not only calculates which object class exists but also how many occurrences are present for each class. Then, the complex part, and the most interesting one for this thesis application, is localizing where those elements are placed inside the image. The position is not considered as a point but as a bounding box defined as the smallest rectangle that contains the entire element. An example of object detection is shown in~\Cref{fig:sampleYolo}.
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/detection/ex1_yolo}
+	\caption[Object detection applied on a sample image.]{Object detection applied on a sample image\protect\footnotemark.}
+	\label{fig:sampleYolo}
+\end{figure}
+%the footnote placed in the capion are a little bit tricky. Look at: https://tex.stackexchange.com/questions/10181/using-footnote-in-a-figures-caption
+\footnotetext{Several images and implementing ideas of this thesis come from the online blogs pyImageSearch\cite{pyImageSearch} and LearnOpenCV\cite{learnOpenCV}.}
+
+\subsection{Similar tasks}
+Object detection can be additionally improved to extract even more information from an image.\\
+The main evolutions, shown in~\Cref{fig:imgAnalysisType} are:
+\begin{itemize}
+	\item \textbf{Semantic segmentation:} takes all the bounding boxes produced by an object detector, and for each one, it calculates the pixels that belong to the object itself and the ones that do not. By doing this each class has its own colour associated. As a result, the algorithm knows for each pixel if it belongs to one label associated with the image (semantic division) or to the background (yellow in the image).
+	\item \textbf{Instance segmentation:} is similar to semantic segmentation, but in this case, each instance of the object is considered as a new element. In fact, the three cubes in the figure have different colours associated to them.\\
+	This task is solved by the \textbf{Mask-R-CNN algorithm} (\Cref{sec:mask-r-cnn}).
+	\item \textbf{(Human) pose estimation:} is the most complex task among the five. Mainly applied to people, this challenge consists in the estimation of the 3D position of the body. The idea is to build up a skeleton of the person in the image and understand how its body limbs are positioned. This functionality is important to understand what a person is doing in the image.\\
+	This task is solved by the \textbf{OpenPose estimation algorithm} (\Cref{sec:openpose}).
+\end{itemize}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/detection/types-of-img-analysis}
+	\caption{Similar problems respect to object localization/detection.}
+	\label{fig:imgAnalysisType}
+\end{figure}
+
+
+
+\section{State of the art algorithms}
+Object detection has a lot of applications both in real-time, such as in this thesis, but also in safety-critical scenarios like cars with autonomous driving. This division brings out two different metrics: precision and speed. The ideal detector is both fast and precise, however this algorithm does not exist yet. The methods can be divided into two categories.\\
+The solutions mainly focus on speed: YOLO (\Cref{sec:yolo}) and SSD (\Cref{sec:ssd}).\\
+Instead, the one mainly focused on precision is R-CNN (\Cref{sec:r-cnn}).
+
+
+\subsection{YOLO (You Only Look Once)} \label{sec:yolo}
+YOLO\cite{yolo} was initially designed in 2016. At that time it was the first object detector approach to use a single \textbf{CNN (Convolutional Neural Network)}. Redmon et al. goals were to create an extremely fast detector. An overview of the overall procedure is shown in~\Cref{fig:howItWorks_yolo}, and the architecture appears in~\Cref{fig:architecture_ssdVSyolo}.\\
+The image shows a two step procedure, but these steps are solved in parallel. This is the core idea of the paper. A single CNN can be highly optimized.\\
+The YOLO procedure works as follows\footnote{The original presentation of YOLO by Redmon at CVPR 2016 conference can be found \href{https://www.youtube.com/watch?v=NM6lrxy0bxs}{here}.}:
+\begin{itemize}
+	\item Preprocess: the image is resized to fit the standard input dimension of the CNN.
+	\item Left image: the picture it is divided into a grid of CxC cells.
+	\item Top image: each cell suggests some bounding boxes centred on it, that can match elements in the background. To each box is associated a value describing the probability that it contains one of the elements of the image.\\
+	At most one detection per box can be selected as correct. This relies on the assumption that two correct bounding boxes cannot share the centre. This is both an efficient idea but also a big limitation. Too small elements, close to each other, cannot be both detected.
+	\item Bottom image: each cell has an associated probability regarding a label that represents the class that can be found in that cell if an element exists in it.\\
+	I.e. the cyan cells means: "if there is something here, it will belong to class 'DOG' ".
+	\item Right image: the two partial elaborations are merged. The most likely bounding boxes are chosen and classes are associated to them according to the value for each cell in the probability map.
+\end{itemize}
+That was the first YOLO version, in this thesis is used the third\cite{yoloV3}. Mainly, the changes were about recognition of a wider set of classes and small implementing details to improve the overall precision of the algorithm.\\
+\\
+The output of the CNN is generated extremely fast and it is accurate however has a big problem. Often if two classes have similar probabilities or the shape of the element is not perfect YOLO might propose more than one bounding box for each element. That is the case of~\Cref{fig:sub_noNMS_yolo} where the truck is classified both as "truck" and as "car". The same happens to the person that has been seen twice.\\
+To solve this, it is necessary to apply a new technique: Non-Maximum Suppression.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/detection/howItWorks_yolo}
+	\captionsetup{margin=0.5cm}
+	\caption[The steps of the YOLO algorithm.]{The YOLO image elaboration based on bounding box proposal and class probability map.}
+	\label{fig:howItWorks_yolo}
+\end{figure}
+
+\subsubsection*{NMS (Non-Maximum Suppression)}
+This technique\cite{nms} is a post-processing that works on the bounding boxes suggested, as output, from YOLO or other detectors. NMS does not consider the source image. The goal of this procedure is to refine the bounding boxes proposed and to choose which subset of them is better to fit the final image prediction. Two examples of applications are shown in~\Cref{fig:nms}.\\
+The main flow of the algorithm is as follows:
+\begin{itemize}
+	\item The input is a list of all the boxes generated for a single image. Associated to each one there is its probability.
+	\item The boxes are sorted in decreasing order according to the probability associated.
+	\item Then, each box is accepted or rejected according to the \textbf{IoU (Intersection Over Union)}. That is the percentage of overlapping area with an already accepted box.
+	\begin{itemize}
+		\item If the IoU is above a certain threshold, meaning that the two boxes overlap too much, the one with the lowest probability is discarded.
+		\item If that is not the case, the box is accepted as a new prediction.
+	\end{itemize}
+\end{itemize}
+The input in~\Cref{fig:sub_noNMS}, is processed and only one box is accepted (\Cref{fig:sub_withNMS}) because the IoU is very high. Instead, in~\Cref{fig:sub_noNMS_yolo}, two boxes are removed respectively from two other separated boxes (\Cref{fig:sub_withNMS_yolo}) because two different subjects are involved.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{.13\linewidth}
+		\includegraphics[width=1\linewidth]{images/detection/img1_noNMS}
+		\caption{Overlap bounding boxes }
+		\label{fig:sub_noNMS}
+	\end{subfigure}
+	\begin{subfigure}{.13\linewidth}
+		\includegraphics[width=1\linewidth]{images/detection/img1_withNMS}
+		\caption{Refined bounding box}
+		\label{fig:sub_withNMS}
+	\end{subfigure}
+	\begin{subfigure}{.35\linewidth}
+		\includegraphics[width=1\linewidth]{images/detection/ex2_yolo_noNMS}
+		\captionsetup{margin=0.3cm}
+		\caption{YOLO generated bounding boxes}
+		\label{fig:sub_noNMS_yolo}
+	\end{subfigure}
+	\begin{subfigure}{.35\linewidth}
+		\includegraphics[width=1\linewidth]{images/detection/ex2_yolo}
+		\captionsetup{margin=0.3cm}
+		\caption{Apply NMS to refine the YOLO's output}
+		\label{fig:sub_withNMS_yolo}
+	\end{subfigure}
+	\captionsetup{margin=0.5cm}
+	\caption[Examples of application of NMS post-processing.]{Two scenarios of application of Non-maximum suppression algorithm. First: choose which of the 6 manual generated bounding boxes, on Audrey Hepburn's face, should be considered the correct one. Second: refinement of the YOLO prediction output, by removing the "car" and "person" prediction.}
+	\label{fig:nms}
+\end{figure}
+
+
+\subsection{SSD (Single Shot multibox Detector)} \label{sec:ssd}
+The principal competitor of YOLO is SSD\cite{ssd}. Both are based on the same principle: the use of a single Convolutional Neural Network to propose bounding boxes and associate them to classes. The CNN is optimized as much as possible to improve the speed performance and eventually even the accuracy.\\
+The difference relies on how the two algorithms deal with the bounding boxes suggestion. YOLO for each cell of the grid chooses a couple of options and at most one can be chosen.\\
+On the other hand, SSD works as follows (\Cref{fig:howItWorks_ssd}):
+\begin{itemize}
+	\item The image is divided into a grid of CxC cells, called \textbf{feature map}.
+	\item Each cell can propose a set of default boxes that has a size measured in cells (i.e. 3 cells high and 2 wide).
+	\item The process is repeated many times varying the value of C: the \textbf{granularity of the grid}. This guarantees that the algorithm is scale-independent matching both, big and small, subjects.\\
+	In~\Cref{fig:architecture_ssdVSyolo} is shown how the convolution layers blocks are matched together only at the end.
+	\item All the suggestions are merged together to produce the final proposals.
+	\item SSD internally performs NMS to remove unnecessary detections.
+\end{itemize}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/detection/howItWorks_ssd}
+	\captionsetup{margin=0.5cm}
+	\caption[The steps of the SSD algorithm.]{The SSD image processing and how the bounding box proposal is elaborated.}
+	\label{fig:howItWorks_ssd}
+\end{figure}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\linewidth]{images/detection/architecture_ssdVSyolo}
+	\captionsetup{margin=0.5cm}
+	\caption[Comparison of the architectures of SSD and YOLO.]{A comparison of architectures between SSD and YOLO which is designed as a compact block. Instead, SSD is modular, it is divided into convolution layers of different scales, combined at the end, to make the algorithm scale-independent.}
+	\label{fig:architecture_ssdVSyolo}
+\end{figure}
+
+
+\subsubsection*{MobileNet}
+The implementation of the project does not use a traditional version of SSD, but a lighter one. This model is a combination of SSD and mobileNet\cite{mobilenet}.\\
+MobileNet is a methodology that approaches Convolutional Neural Networks to transform the architecture structure to build a much lighter version of the model. The concept was first ideated to allow low power devices, such as smartphones, to run computational expensive algorithms based on CNN.\\
+The principle is to replace each standard convolution (\Cref{fig:sub_architecture_mobileNet1}) with a \textbf{Depthwise separable filter}. A standard convolution works on a grid of DxD pixels and for each one produces output features of depth M. This operation can be repeated N times for each source feature.\\
+The operation is broken into two other simpler convolutions:
+\begin{itemize}
+	\item \textbf{Depthwise convolutional filters} (\Cref{fig:sub_architecture_mobileNet2}): produces only one feature output at a time, repeated M times for each DxD grid.
+	\item \textbf{Pointwise convolution filters} (\Cref{fig:sub_architecture_mobileNet3}): extends the output feature of the depthwise filter to N output features.
+\end{itemize}
+The original paper demonstrates how these two operations stacked in a row, can produce results close to the correct ones.\\
+The computational cost determined by the number of parameters, used by depthwise and pointwise filters, can be further reduced by randomly removing a percentage of these parameters. According to the portion of parameters removed (25\%, 50\%, 75\%), the algorithm precision is affected.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet1}
+		\caption{Standard convolution filters}
+		\label{fig:sub_architecture_mobileNet1}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet2}
+		\caption{Depthwise convolutional filters}
+		\label{fig:sub_architecture_mobileNet2}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet3}
+		\caption{1x1 convolutional filters called Pointwise convolution filters}
+		\label{fig:sub_architecture_mobileNet3}
+	\end{subfigure}
+	\captionsetup{margin=0.5cm}
+	\caption[The schemes of convolutions introduced by mobileNet.]{The novelty of mobileNet is that it converts a traditional convolution (A), into a combination of two lighter convolutions (B-C), that produce almost the same output.}
+	\label{fig:architecture_mobileNet}
+\end{figure}
+
+
+\subsection{R-CNN (Region-based Convolutional Neural Networks)} \label{sec:r-cnn}
+\textbf{R-CNN}\cite{r-cnn} was the first invented method of the three in this section. Differently from YOLO and SSD, it is mainly focused on performing detections with high precision, despite the processing time.\\
+This algorithm is a two step object detector. The workflow, shown in~\Cref{fig:howItWorks_rcnn}, works as follows:
+\begin{enumerate}
+	\item A region proposal algorithm is executed on the input image and it produces 2000 bounding boxes.
+	\item Each of these proposals are elaborated independently. \\
+	For each box, an image classifier, based on CNN, produces features from the image and then predicts which classes they might contain.\\
+	Any kind of image classifier can be used for this task resulting in an algorithm that can be easily adapted with new networks.
+\end{enumerate}
+The main problem is that overlapping proposals are elaborated independently. The result is that feature extraction is performed on the same area of the image multiple times. These have been solved with a second version of the algorithm, called \textbf{Fast-R-CNN}\cite{fast-r-cnn}. The feature extraction for the full image is performed before the image classification that now works on an already generated image of features.\\
+An incremental improvement, comes from the third version: \textbf{Faster-R-CNN}\cite{faster-r-cnn}. It performs the feature extraction as the first step and based on it the bounding boxes are proposed with \textbf{RPN (Region Proposal Network)}. The modified structure allows ad hoc optimizations to improve the low processing time.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/detection/howItWorks_rcnn}
+	\caption{The 2-step elaboration of R-CNN model on a sample image.}
+	\label{fig:howItWorks_rcnn}
+\end{figure}
+
+
+
+\section{Other famous algorithms}
+\subsection{Mask R-CNN} \label{sec:mask-r-cnn}
+A variation of R-CNN that aims to solve the instance segmentation task (\Cref{fig:imgAnalysisType}) is Mask R-CNN\cite{mask-r-cnn}.\\
+Mask R-CNN is built on top of two technologies:
+\begin{itemize}
+	\item Faster R-CNN used as an object detector.
+	\item \textbf{FCN (Fully Convolutional Network)}\cite{fcn} that performs semantic segmentation.
+\end{itemize}
+For each bounding box, it is known the class, then FCN computes the segmentation of that class. All the shapes of elements in the image are then merged together to build the instance segmentation result. An application of this algorithm is shown in~\Cref{fig:ex2_maskRCNN}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/detection/ex2_maskRCNN}
+	\caption{Instance segmentation of an image using mask R-CNN.}
+	\label{fig:ex2_maskRCNN}
+\end{figure}
+
+
+\subsection{Open Pose} \label{sec:openpose}
+Firstly designed in 2017 OpenPose\cite{openpose-PAF} aims at processing an image and recognising the position of the people in it. The position is the skeleton of a person, it is the interconnection of limbs that link 15 points on the human body.\\
+This algorithm opens al lot of possibilities because until then estimating the body position was achieved with 3D cameras, extremely expensive hardware that now can be easily substituted. Recently, OpenPose has been improved in terms of speed, to process frames in a video with \textbf{STAF (Spatio-Temporal Affinity Field)}\cite{openpose-STAF}, and it is also been extended to understand the 3D human position.\\
+An overview of the overall procedure of the algorithm is shown in~\Cref{fig:howItWorks_openpose}, instead some output examples are shown in~\Cref{fig:ex_openpose}.\\
+The OpenPose procedure works as follows\footnote{The original demo of OpenPose by Zhe Cao at CVPR 2017 conference can be found \href{https://www.youtube.com/watch?v=pW6nZXeWlGM}{here}.}:
+\begin{enumerate}[a)]
+	\item Preprocessing: the input image is reshaped to match the requirements of the two-branch CNN.
+	\item Part Confidence Maps: the first branch of the CNN process the image to extract the location of the 15 body parts.\\
+	Each body part (i.e. left shoulder, left knee, right wrist...) is detected by an ad hoc filter. These filters do not process one person at a time but the entire image simultaneously. The result is that a filter recognises all the visible right elbows in the image. This is extremely important because, by doing this, the algorithm process speed is independent respect to the number of people in the image.
+	\item Part affinity fields: the second branch of the CNN process the image to recognise the limbs that can connect all the body points found so far.
+	\item Bipartite matching: has the goal to match all the elements found to reconstruct the skeleton of the entire person.\\
+	This reconstruction is a greedy approach mainly based on geometry that wants to minimize the distance of two parts that must be connected.
+	\item Parsing results: the output image is assembled with the full-body poses for all people in the image.
+\end{enumerate}
+It is important to note that OpenPose is a bottom-up approach. The algorithm has no knowledge about the positioning of people in the image, it only tries to reconstruct the skeleton from small sections of the body.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/detection/howItWorks_openpose_2line}
+	\captionsetup{margin=0.5cm}
+	\caption[The steps of the OpenPose algorithm.]{The elaboration of the OpenPose algorithm to recognise the skeleton of the two dancers in the image.}
+	\label{fig:howItWorks_openpose}
+\end{figure}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\linewidth]{images/detection/ex_openpose_2line}
+	\captionsetup{margin=0.5cm}
+	\caption[Examples of application of OpenPose.]{Some examples, taken from the original paper, on how OpenPose works.}
+	\label{fig:ex_openpose}
+\end{figure}
+
+
+
+\section{Overview of the algorithms}
+The algorithms presented in this chapter represent the state of the art methods for their field of application.\\
+All those methods can be used to achieve the long-term tracking that is the goal of this thesis, but the different information generated should be used to solve the problem with different approaches. We have chosen to use the methods that perform only the detection task. This results on one hand into general information as output, and on the other hand into a very high processing speed that is fundamental for real-time application.
+
+\subsubsection*{Performances comparison}
+A comparison of the speed, measured as \textbf{FPS (Frames Per Second)}, and of the precision, measured as \textbf{mAP (mean Average Precision)}, is shown in~\Cref{tab:detectionPerformances}. The data are based on the Pascal VOC 2007 dataset\cite{pascal-voc-2007} and come from multiple papers\cite{yolo}\cite{yoloV2}.\\
+The measures do not show YOLOv3 because compared to the other methods it is more recent and a fair comparison does not exist. Instead, for Mask R-CNN and OpenPose, only the frame rate is shown because the mAP can be computed. However it is completely irrelevant respect to the other presented in the table. These two algorithms perform different tasks hence the precision of the result cannot be compared.\\
+By looking at the data, it clearly appears that the single-stage algorithms (SSD and YOLO) are much faster respect to the two-stage methods (R-CNN), in fact, they run around 5-10 times faster than R-CNN. Instead, the precision of the three detectors is almost the same. For these reasons, we have chosen to use in this project the last version of YOLO and a lighter version of SSD: mobileNet-SSD. This idea pays a few percentage points in term of mAP but implements the CNN with fewer parameters, results in a low power consumption method. This aspect is important because the robots do not mount top quality hardware, therefore the light version of SSD can be executed more easily.
+
+\subsubsection*{Output visualization}
+To visually show the potentialities of these algorithms we have applied all of them on the same picture. This elaboration is presented in~\Cref{fig:ex_detectionAlgorithms}. Independently from the task that they solve, it appears evident that all of them recognise the 5 people in the foreground, but there are some differences:
+\begin{itemize}
+	\item SSD has troubles with the player on the left. In fact, the percentage associated with him is only a 32\%.
+	\item YOLO is able to detect even a sixth person in the background that none of the others have seen.
+	\item YOLO is trained to recognise a wide variety of objects respect to the other detectors, in fact, it is able to recognise even the "sports ball".\\
+	Even SSD is adaptable and can be trained to recognise the ball. However the big advantage of the second version of YOLO (also called \textbf{YOLO9000}), is that it was integrated with the \textbf{Wordnet graph}\cite{wordnet} to be scalable in terms of the number of classes recognised. The result is a detector that is able to recognise up to 9000 different classes.
+	\item Mask R-CNN is, in this example, the most accurate algorithm. It recognises four people with a precision of 99\% and the last one with 92\%. 
+	\item OpenPose, by estimating the body parts, can even understand the orientation of the people in the soccer field. This big advantage can be used to understand where these people will move in the frame after this one.
+\end{itemize}
+Considering these reasons, it is evident that discarding OpenPose and Mask R-CNN, in favour of SSD and YOLO, is only a choice for this project. All these algorithms have potentiality that can be used to create a good object tracker.
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+		\hline
+		Pascal VOC 2007 & \multicolumn{2}{c|}{YOLO} &     & \multicolumn{4}{c|}{R-CNN}   &          \\ \hline
+		Algorithm       & v1          & v2          & SSD & R-CNN & Fast & Faster & Mask & OpenPose \\ \hline
+		FPS             & 45          & \textbf{67}          & 46  & 0.05  & 0.5  & 7      & 7    & 10       \\ \hline
+		mAP             & 66          & \underline{\textbf{76}}          & \underline{74}  & 53    & 70   & \underline{73}     & X    & X        \\ \hline
+	\end{tabular}
+	\captionsetup{margin=0.5cm}
+	\caption[Comparison of mAP and FPS for the object detector algorithms.]{Overview of the performances of the algorithms presented. The evaluation is based on the mAP and the processing speed. In bold the best scores and underlined the mAP of the three states of the art detectors.}
+	\label{tab:detectionPerformances}
+\end{table}
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{.45\linewidth}
+		\includegraphics[width=\linewidth]{images/detection/ex3_yolo}
+		\caption{YOLOv2: detection}
+	\end{subfigure}
+	\begin{subfigure}{.45\linewidth}
+		\includegraphics[width=\linewidth]{images/detection/ex3_ssd}
+		\caption{SSD: detection}
+	\end{subfigure}
+	\begin{subfigure}{.45\linewidth}
+		\includegraphics[width=\linewidth]{images/detection/ex3_mask-rcnn}
+		\caption{Mask R-CNN: instance segmentation}
+	\end{subfigure}
+	\begin{subfigure}{.45\linewidth}
+		\includegraphics[width=\linewidth]{images/detection/ex3_openpose}
+		\caption{OpenPose: human pose estimation}
+	\end{subfigure}
+	\captionsetup{margin=0.5cm}
+	\caption[YOLO, SSD, Mask R-CNN and OpenPose applied on the same image.]{An example of application of the four main algorithms, based on the same sample image.}
+	\label{fig:ex_detectionAlgorithms}
+\end{figure}
+
+
+
+
+
+
