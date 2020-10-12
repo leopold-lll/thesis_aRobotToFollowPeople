@@ -9,7 +9,7 @@ Instead, the output of the algorithm is a position composed of X and Y pixel coo
 Finally, it moves to reach that position, in order to follow the tracked subject not only into the virtual space but also into the real environment.
 
 
-\section{The Problem}
+\section{The problem}
 The thesis project\cite{projectSourceCode} is based on an internship with Dolomiti Robotics\cite{dolomitiRobotics}, a company working on self-driving robots.\\
 These vehicles are designed to work in an industrial environment. This scenario is populated not only by robots but also people, making the driving task even more complex to achieve.
 
@@ -54,7 +54,7 @@ Below is listed a small collection of the principal problems that make this func
 \end{itemize}
 
 
-\section{The Solution}
+\section{The solution}
 The problem is complex due to its generality and the necessity to cover a lot of complementary conditions. For this reason more than one solution exists. In this thesis is presented a solution based on the combination of three methods. Each one is designed to solve sub-problem compared to this one, and none of them alone can overcome the challenge of the general task.\\
 
 \subsection{Existing technologies}\label{sec:existingTechnologies}
@@ -108,6 +108,43 @@ These are the main steps of the entire algorithm:
 
 This flow shows how detection, tracking and recognition are combined together to build a complete algorithm, that can run in real-time due to the alternation of slow and fast methods and to manage all the problematic scenarios.\\
 The details will follow.
+
+
+\section{Prior technical knowledge}
+In this section are presented some technologies that should be known in order to well understand the algorithms presented in the next chapters.
+
+\subsection{NN (Neural Network)} \label{sec:nn}
+A NN\footnote{A more visually and very well done explanation on how a NN works can be found online. The 3Blue1Brown youtube channel has published videos about  the mechanics of \href{https://www.youtube.com/watch?v=IHZwWFHWa-w}{gradient descent} and about the learning phase based on \href{https://www.youtube.com/watch?v=Ilg3gGewQ5U}{back-propagation}.} is a black box containing several layers (\Cref{fig:howItWorks_NNlayers}). Each layer takes as input the output values of the layer before. The input of the NN goes into the first layer and the output comes from the last one. Each layer is composed by a certain amount of neurons (\Cref{fig:howItWorks_neutron}). Each of these neurons computes a weighted summation of all the output values of the neurons in the previous layer. For each couple of neurons in consecutive layers exists a weight that multiply the output of the first one to generate the input of the next one. The final output of a neuron is then computed by summing up a bias and by applying an activation function such as ReLU (Rectified Linear Unit), SoftMax or Identity.\\
+
+\subsubsection*{Gradient descend}
+The final prediction of the NN correspond to the label of the neuron, in the last layer, with the highest value. The overall output of the last layer is evaluated with a cost function. The higher the cost the worst were the prediction, a perfect prediction will have cost equal to zero. The total cost of a model is the average cost, computed on the last layer, over all the input training set.\\
+The training of the NN is based on the minimization of the cost function. Since that the cost function is based on thousands of dimensions that represent the weights, the minimization cannot be analytically solved. The solution is the \textbf{gradient descend} technique. Basically, a set of input values, and all the associated outputs, produce a specific average cost. This generated point in the cost function has a gradient. According to the gradient we know respect to the point where the function has a lower value, hence better performances. The goal is now to tune the weights of all the internal connections of the NN according to the value of the gradient. Everything is clear if the gradient can be computed, and this is possible with the \textbf{back-propagation} technique.
+
+\subsubsection*{Back-propagation}
+Essentially the gradient represent the direction to the local minimum of the function. Another interpretation is that the magnitude of gradient in a dimension represent how useful a weight is for the final prediction. For each input of the NN the neurons in the last layer should be tuned to produce a cost equal to zero. The variation for each neuron depends on all its input and the respective weights. Each of that input is influenced by all the neurons in the last layer. In addition not only an input is used in the NN but an entire dataset.\\
+The result is a variation for each neuron that aims to reduce the generated cost. This variation will then influence the previous layer and its weights, then the one before and so on and so forth up to the first layer. This is the key idea of the back-propagation.\\
+Once plenty of input has been passed through the NN the weight are finally calibrated. The combination of the NN architecture and its weights is the model.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{images/howItWorks_NNlayers}
+		\caption{NN}
+		\label{fig:howItWorks_NNlayers}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{images/howItWorks_neutron}
+		\captionsetup{margin=0.5cm}
+		\caption{neutron}
+		\label{fig:howItWorks_neutron}
+	\end{subfigure}
+	\captionsetup{margin=0.5cm}
+	\caption{description.}
+	\label{fig:howItWorks_NN}
+\end{figure}
+
+\subsection{CNN (Convolutional Neural Network)} \label{sec:cnn}
+\href{https://www.youtube.com/watch?v=YRhxdVk_sIs}{CNN} from deepLizard
 
 \section{Structure of the thesis}
 The next chapters are organized as follows. This section concludes the introduction (\Cref{cha:introduction}).\\

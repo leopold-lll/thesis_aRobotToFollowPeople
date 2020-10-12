@@ -191,7 +191,7 @@ Instead of using only the positive sample to fit the online classifier, MIL crea
 	\centering
 	\includegraphics[width=1\linewidth]{images/tracking/sample_MIL}
 	\captionsetup{margin=0.5cm}
-	\caption[Examples of partial occlusion tracking.]{A sample of the MIL classifier tracking the face of the author while is partially occluded by a book. MIL tracker is in purple, while cyan and green are respectively FragTrack\cite{fragTrack} and Online Ada-Boost\cite{onlineAdaBoostTracker}.}
+	\caption[Examples of partial occlusion tracking.]{A sample of the MIL classifier tracking the face of the author while is partially occluded by a book. MIL tracker is in purple, while \textbf{\textcolor{cyan}{cyan}} and \textbf{\textcolor{green}{green}} are respectively FragTrack\cite{fragTrack} and Online Ada-Boost\cite{onlineAdaBoostTracker}.}
 	\label{fig:sample_MIL}
 \end{figure}
 \begin{figure}[!h]
@@ -243,7 +243,7 @@ The full name of the method is Discriminative Correlation Filter with Channel an
 \\
 A \textbf{cross correlation filter} is a technique that aims at localizing into an image the exact position of another one. A representation of the cross-correlation usage done by CSRT is shown in~\Cref{fig:howItWorks_CSRT}. In details, the portion of the last frame, delimited by the last known bounding box, is elaborated with multiples correlation filters, each one producing a different output. These elaborations simulate possible changes in the appearance of the subject. Designing good filters is fundamental to well match the variability of the tracked subject and the generated features. The filter outputs are modified images of the last bounding box cropped area.\\
 The output of each filter (an image) is moved along the full picture pixel by pixel (learning stage:~\Cref{fig:howItWorks_CSRT} left) to check which portion of the entire camera view is more probable the subject that we are looking for. The result of this scan is a confidence map that should present a peak in correspondence of the new position of the tracked subject.\\
-All the filters can then be summed up together (localization stage:~\Cref{fig:howItWorks_CSRT} right) to highlight the proposal of each one and comes out with the final response. This response shows exactly where the subject is placed in the new frame. A visualization of a confidence map applied to the original image is shown in~\Cref{fig:sample_CSRT}.\\
+All the filters can then be summed up together (localization stage:~\Cref{fig:howItWorks_CSRT} right) to highlight the proposal of each one and comes out with the final response. This response shows exactly where the subject is placed in the new frame.\\
 \\
 The characterization of CSRT is focused on the type of correlation filters used, with the idea of using a lot of them and combine the results at the end to produce a more reliable localization. The very high accuracy that this algorithm offers is compensated by the low FPS rate that it achieves.
 
@@ -254,13 +254,13 @@ The characterization of CSRT is focused on the type of correlation filters used,
 	\caption[The general intuition of the CSRT algorithm.]{The overall procedure of the CSRT algorithm. The \underline{learning stage} is composed of multiple correlation filters that are applied to the input frame. Each filter produces a confidence map that highlights where the subject should be. The \underline{localization stage} combines all these confidence maps to produce the final response that precisely locates the subject.}
 	\label{fig:howItWorks_CSRT}
 \end{figure}
-\begin{figure}[!h]
-	\centering
-	\includegraphics[width=0.8\linewidth]{images/tracking/sample_CSRT}
-	\captionsetup{margin=0.5cm}
-	\caption[An example of application of CSRT on a frame.]{A visualization of the confidence map applied to track the face of the man in the image. On the left the original image, centre the confidence map in 2D. On the right the cropped image according to localization.}
-	\label{fig:sample_CSRT}
-\end{figure}
+%\begin{figure}[!h]
+%	\centering
+%	\includegraphics[width=0.8\linewidth]{images/tracking/sample_CSRT}
+%	\captionsetup{margin=0.5cm}
+%	\caption[An example of application of CSRT on a frame.]{A visualization of the confidence map applied to track the face of the man in the image. On the left the original image, centre the confidence map in 2D. On the right the cropped image according to localization.}
+%	\label{fig:sample_CSRT}
+%\end{figure}
 
 
 \subsection{MOSSE (Minimum Output Sum of Squared Error) tracker}
@@ -277,27 +277,29 @@ Then, both squared images are processed with two independent stacks of convoluti
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\linewidth]{images/tracking/howItWorks_GOTURN}
+	\includegraphics[width=0.9\linewidth]{images/tracking/howItWorks_GOTURN}
 	\captionsetup{margin=0.5cm}
 	\caption[The overall procedure of the GOTURN algorithm.]{The overall procedure of the GOTURN algorithm. On the left, the frames coming from the camera are cropped with the same square, that is centred on the subject in the previous frame (above). The images are elaborated with CNN to produce the output bounding box, that highlights where the subject is in the current frame.}
 	\label{fig:howItWorks_GOTURN}
 \end{figure}
 \begin{figure}
 	\centering
-	\begin{minipage}{.65\textwidth}
+	\begin{minipage}{.62\textwidth}
 		\centering
 		\includegraphics[width=1\linewidth]{images/tracking/sample_GOTURN}
 		\captionsetup{margin=0.5cm}
-		\captionof{figure}[Examples of application of the GOTURN algorithm.]{Samples of application of the CNN of GOTURN. The two squared images coming from previous (above) and current (below) frame are fed into the network. The answer is the green bounding box that locates the tracked subject on the new frame.}
+		\captionof{figure}[Examples of application of the GOTURN algorithm.]{Samples of application of the CNN of GOTURN. The two squared images coming from previous (above) and current (below) frame are fed into the network. The answer is the \textbf{\textcolor{green}{green}} bounding box that locates the tracked subject on the new frame.}
 		\label{fig:sample_GOTURN}
 	\end{minipage}
-	\begin{minipage}{.34\textwidth}
+	\hspace{0.03\linewidth}
+	\begin{minipage}{.32\textwidth}
 		\centering
 		\includegraphics[width=1\linewidth]{images/tracking/howItWorks_TLD}
 		\captionof{figure}{The interconnection of the three foundation methods of TLD algorithm.}
 		\label{fig:howItWorks_TLD}
 	\end{minipage}
 \end{figure}
+
 
 \subsection{TLD (Tracking-Learning-Detection)} \label{sec:tld}
 Differently from all the other methods, TLD\cite{tld} aims to be a complete tracker able to deal with extremely complex scenarios. If the previously presented trackers have no chance to manage a long-time total occlusion and a long-term tracking, this method is able to overcome both of the problems. A sample showing potentiality is in the~\Cref{fig:sample_TLD}.\\
@@ -307,9 +309,9 @@ The trade-off to use this extremely flexible structure is paid with a not high F
 Despite the good potentialities, this algorithm is not reliable for the traditional tracking task.
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=1\linewidth]{images/tracking/sample_TLD}
+	\includegraphics[width=.9\linewidth]{images/tracking/sample_TLD}
 	\captionsetup{margin=0.5cm}
-	\caption[TLD algorithm applied on a total occlusion video clip.]{A sample that shows the potentialities of the TLD algorithm, dealing with a total occlusion while tracking a motorbike with a dramatic change of size. The red dot means that the subject cannot be found.}
+	\caption[TLD algorithm applied on a total occlusion video clip.]{A sample that shows the potentialities of the TLD algorithm, dealing with a total occlusion while tracking a motorbike with a dramatic change of size. The \textbf{\textcolor{red}{red}} dot means that the subject cannot be found.}
 	\label{fig:sample_TLD}
 \end{figure}
 
@@ -326,9 +328,9 @@ The requirement is to solve the baseline tracking task (\Cref{sec:tracking-defin
 	\item \underline{\textbf{CSRT}} is the most reliable method, it could even manage short total occlusions. Despite the low FPS rate is a great choice, in fact, our goal is a tracker running at around 5 FPS that is way less than the speed of CSRT.
 	\item \underline{\textbf{MOSSE}} is focused on pure speed. It is not the most reliable method but it can be a good choice to try to reach the highest FPS rate for the general challenge.
 	\item \underline{\textbf{GOTURN}} is a reliable method, running at a good FPS rate. At the moment it is not integrated in this project but it can be a great choice for future improvements.
-	\item \textbf{TLD} is a too complex method. It is able to solve long total occlusions but easily fails on simpler scenarios, by proposing a lot of false positives. It is not reliable at all for our purpose.\\
-	TLD is based on a principle that is similar to the one proposed in this thesis. The integration of tracking and detection linked together with a third procedure: learning in case of TLD and person recognition for this project. Both algorithms aim at solving the total occlusion problem and the drift problem with a reinitialization of the tracker performed with an object detector. The key difference is the existence in this thesis of the \textit{slow start} phase presented in~\Cref{sec:slowStartPhase}.
+	\item \textbf{TLD} is a too complex method. It is able to solve long total occlusions but easily fails on simpler scenarios, by proposing a lot of false positives. It is not reliable at all for our purpose.
 \end{itemize}
+Note that the principle proposed in this thesis is similar to the one of which TLD is based. The integration of tracking and detection linked together with a third procedure: learning in case of TLD and person recognition for this project. Both algorithms aim at solving the total occlusion problem and the drift problem with a reinitialization of the tracker performed with an object detector. The key difference is the existence in this thesis of the \textit{slow start} phase presented in~\Cref{sec:slowStartPhase}.
 
 \begin{table}[]
 	\centering

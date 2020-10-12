@@ -16,7 +16,7 @@ Object detection, also known as \textbf{object localization}, is an evolution of
 Object detection can be additionally improved to extract even more information from an image.\\
 The main evolutions, shown in~\Cref{fig:imgAnalysisType} are:
 \begin{itemize}
-	\item \textbf{Semantic segmentation:} takes all the bounding boxes produced by an object detector, and for each one, it calculates the pixels that belong to the object itself and the ones that do not. By doing this each class has its own colour associated. As a result, the algorithm knows for each pixel if it belongs to one label associated with the image (semantic division) or to the background (yellow in the image).
+	\item \textbf{Semantic segmentation:} takes all the bounding boxes produced by an object detector, and for each one, it calculates the pixels that belong to the object itself and the ones that do not. By doing this each class has its own colour associated. As a result, the algorithm knows for each pixel if it belongs to one label associated with the image (semantic division) or to the background (\textbf{\textcolor{orange}{yellow}} in the image).
 	\item \textbf{Instance segmentation:} is similar to semantic segmentation, but in this case, each instance of the object is considered as a new element. In fact, the three cubes in the figure have different colours associated to them.\\
 	This task is solved by the \textbf{Mask-R-CNN algorithm} (\Cref{sec:mask-r-cnn}).
 	\item \textbf{(Human) pose estimation:} is the most complex task among the five. Mainly applied to people, this challenge consists in the estimation of the 3D position of the body. The idea is to build up a skeleton of the person in the image and understand how its body limbs are positioned. This functionality is important to understand what a person is doing in the image.\\
@@ -43,12 +43,12 @@ The image shows a two step procedure, but these steps are solved in parallel. Th
 The YOLO procedure works as follows\footnote{The original presentation of YOLO by Redmon at CVPR 2016 conference can be found \href{https://www.youtube.com/watch?v=NM6lrxy0bxs}{here}.}:
 \begin{itemize}
 	\item Preprocess: the image is resized to fit the standard input dimension of the CNN.
-	\item Left image: the picture it is divided into a grid of CxC cells.
-	\item Top image: each cell suggests some bounding boxes centred on it, that can match elements in the background. To each box is associated a value describing the probability that it contains one of the elements of the image.\\
+	\item Left-image: the picture it is divided into a grid of CxC cells.
+	\item Top-image: each cell suggests some bounding boxes centred on it, that can match elements in the background. To each box is associated a value describing the probability that it contains one of the elements of the image.\\
 	At most one detection per box can be selected as correct. This relies on the assumption that two correct bounding boxes cannot share the centre. This is both an efficient idea but also a big limitation. Too small elements, close to each other, cannot be both detected.
-	\item Bottom image: each cell has an associated probability regarding a label that represents the class that can be found in that cell if an element exists in it.\\
+	\item Bottom-image: each cell has an associated probability regarding a label that represents the class that can be found in that cell if an element exists in it.\\
 	I.e. the cyan cells means: "if there is something here, it will belong to class 'DOG' ".
-	\item Right image: the two partial elaborations are merged. The most likely bounding boxes are chosen and classes are associated to them according to the value for each cell in the probability map.
+	\item Right-image: the two partial elaborations are merged. The most likely bounding boxes are chosen and classes are associated to them according to the value for each cell in the probability map.
 \end{itemize}
 That was the first YOLO version, in this thesis is used the third\cite{yoloV3}. Mainly, the changes were about recognition of a wider set of classes and small implementing details to improve the overall precision of the algorithm.\\
 \\
@@ -81,28 +81,29 @@ The input in~\Cref{fig:sub_noNMS}, is processed and only one box is accepted (\C
 	\centering
 	\begin{subfigure}{.13\linewidth}
 		\includegraphics[width=1\linewidth]{images/detection/img1_noNMS}
-		\caption{Overlap bounding boxes }
+		\caption{Overlap bounding boxes.}
 		\label{fig:sub_noNMS}
 	\end{subfigure}
 	\begin{subfigure}{.13\linewidth}
 		\includegraphics[width=1\linewidth]{images/detection/img1_withNMS}
-		\caption{Refined bounding box}
+		\caption{Refined bounding box.}
 		\label{fig:sub_withNMS}
 	\end{subfigure}
+	%\hspace{0.05\linewidth}
 	\begin{subfigure}{.35\linewidth}
 		\includegraphics[width=1\linewidth]{images/detection/ex2_yolo_noNMS}
 		\captionsetup{margin=0.3cm}
-		\caption{YOLO generated bounding boxes}
+		\caption{YOLO generated bounding boxes.}
 		\label{fig:sub_noNMS_yolo}
 	\end{subfigure}
 	\begin{subfigure}{.35\linewidth}
 		\includegraphics[width=1\linewidth]{images/detection/ex2_yolo}
 		\captionsetup{margin=0.3cm}
-		\caption{Apply NMS to refine the YOLO's output}
+		\caption{Apply NMS to refine the YOLO's output.}
 		\label{fig:sub_withNMS_yolo}
 	\end{subfigure}
 	\captionsetup{margin=0.5cm}
-	\caption[Examples of application of NMS post-processing.]{Two scenarios of application of Non-maximum suppression algorithm. First: choose which of the 6 manual generated bounding boxes, on Audrey Hepburn's face, should be considered the correct one. Second: refinement of the YOLO prediction output, by removing the "car" and "person" prediction.}
+	\caption[Examples of application of NMS post-processing.]{Two scenarios of application of Non-Maximum Suppression algorithm. First: choose which of the 6 manual generated bounding boxes, on Audrey Hepburn's face, should be considered the correct one. Second: refinement of the YOLO prediction output, by removing the "car" and "person" prediction.}
 	\label{fig:nms}
 \end{figure}
 
@@ -150,17 +151,19 @@ The computational cost determined by the number of parameters, used by depthwise
 
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}{0.32\textwidth}
+	\begin{subfigure}[t]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet1}
 		\caption{Standard convolution filters}
 		\label{fig:sub_architecture_mobileNet1}
 	\end{subfigure}
-	\begin{subfigure}{0.32\textwidth}
+	\hspace{0.02\linewidth}
+	\begin{subfigure}[t]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet2}
 		\caption{Depthwise convolutional filters}
 		\label{fig:sub_architecture_mobileNet2}
 	\end{subfigure}
-	\begin{subfigure}{0.32\textwidth}
+	\hspace{0.02\linewidth}
+	\begin{subfigure}[t]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{images/detection/architecture_mobileNet3}
 		\caption{1x1 convolutional filters called Pointwise convolution filters}
 		\label{fig:sub_architecture_mobileNet3}
@@ -279,19 +282,22 @@ Considering these reasons, it is evident that discarding OpenPose and Mask R-CNN
 \end{table}
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}{.45\linewidth}
+	\begin{subfigure}{.48\linewidth}
 		\includegraphics[width=\linewidth]{images/detection/ex3_yolo}
 		\caption{YOLOv2: detection}
 	\end{subfigure}
-	\begin{subfigure}{.45\linewidth}
+	\hspace{0.01\linewidth}
+	\begin{subfigure}{.48\linewidth}
 		\includegraphics[width=\linewidth]{images/detection/ex3_ssd}
 		\caption{SSD: detection}
 	\end{subfigure}
-	\begin{subfigure}{.45\linewidth}
+	\\
+	\begin{subfigure}{.48\linewidth}
 		\includegraphics[width=\linewidth]{images/detection/ex3_mask-rcnn}
 		\caption{Mask R-CNN: instance segmentation}
 	\end{subfigure}
-	\begin{subfigure}{.45\linewidth}
+	\hspace{0.01\linewidth}
+	\begin{subfigure}{.48\linewidth}
 		\includegraphics[width=\linewidth]{images/detection/ex3_openpose}
 		\caption{OpenPose: human pose estimation}
 	\end{subfigure}
@@ -299,6 +305,9 @@ Considering these reasons, it is evident that discarding OpenPose and Mask R-CNN
 	\caption[YOLO, SSD, Mask R-CNN and OpenPose applied on the same image.]{An example of application of the four main algorithms, based on the same sample image.}
 	\label{fig:ex_detectionAlgorithms}
 \end{figure}
+
+
+
 
 
 
