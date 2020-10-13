@@ -74,9 +74,7 @@
 	breaklines=true,     
 	basicstyle=\small\ttfamily,
 	frame=single, 				%border of the code           
-	commentstyle=\color{teal}, %Indica il colore dei commenti
 	language=Python, 			%Indica il linguaggio predefinito da usare
-	rulecolor=\color{black}, 	%Indica il colore dei numeri di righe
 	,
 	numbers=left,				%Numerazione di pagina
 	xleftmargin=2em,
@@ -85,14 +83,15 @@
 	,	
 	tabsize=4,
 	escapeinside={\%*}{*)},
+	commentstyle=\color{olive}, 			%Indica il colore dei commenti
 	keywordstyle = {\color{blue}},        	%language functions
-	keywordstyle = [2]{\color{darkgray}},   %custom functions 
-	keywordstyle = [3]{\color{olive}},    	%variables
-	keywordstyle = [4]{\color{purple}},   	%for variables
-	otherkeywords= {language_functions}, 	%addition keywords to the normal syntax
-	morekeywords = [2]{custom_functions}, 
-	morekeywords = [3]{variables},
-	morekeywords = [4]{for_variables}
+	keywordstyle = [2]{\color{teal}},   	%custom functions 
+	keywordstyle = [3]{\color{black}},    	%variables
+	keywordstyle = [4]{\color{purple}},   	%class_variables
+	otherkeywords= {language_functions, static, False, True, foreach}, 	%addition keywords to the normal syntax
+	morekeywords = [2]{custom_functions , detectPeople, slowStartPhase, biggestAreaBB, getPosition, addPositive, addNegative, pickOneNegative, leaderTrackingPhase, checkDriftProximity, follow, grab_newFrame, elapsedTime, classify, add, len, pickClosestPosition, initialize, updateRegion, onceEveryKTimes}, 
+	morekeywords = [3]{variables, position, frame, phase1_length, boxes, box, stopDetections, boxesOfleader, positive, boxOfleader, defaultPosition},
+	morekeywords = [4]{class_variables, detector, knn, tracker}
 }
 
 \begin{document}
