@@ -61,6 +61,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand*\NewPage{\newpage\null\thispagestyle{empty}\newpage}
+
 \newcommand{\li}[1]{\textit{(line {#1})}} %custom command to quote the pseudocode lines in the text.
 \usepackage{listings}	%package for code into the text
 \renewcommand{\lstlistingname}{Algorithm}	% change the caption   of the pseudo code from Listing to Algorithm
@@ -102,8 +104,9 @@
 	\clearpage
 	
 	\input{0-ringraziamenti}
-	\clearpage
-		
+	%creo un pagina vuota sulla DESTRA per lasciar spazio ad eventuali dediche (e avere i contenuti tutti assieme)
+	\chapter*{} \thispagestyle{empty} \addtocounter{page}{-1}
+			
 	\mainmatter			% inizio numerazione pagine in numeri arabi
 
 	% indice

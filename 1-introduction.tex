@@ -95,7 +95,7 @@ The method presented in that paper is an integration of two class of methods. In
 Instead, in our scenario we need  to manage the disappearance of the leader behind a corner for a relatively long time. So, the object recognition method was introduced to solve this condition.\\ 
 These are the main steps of the entire algorithm:
 \begin{enumerate}
-	\item The \underline{detection} is executed and the bounding box of the leader is found. By assumptions, in this phase, if more than one person is simultaneously found the detections are ignored.
+	\item The \underline{detection} is executed and the bounding box of the leader is found. By assumptions, in this phase, if more than one person is simultaneously found the leader is chosen according to the area of the bounding boxes. The biggest area represents the most important person hence the leader.
 	\item The \underline{tracker} is initialized with the bounding box found.
 	\item The tracker runs for the next F frames.
 	\item A new detection is executed and D people are found.
@@ -114,37 +114,64 @@ The details will follow.
 In this section are presented some technologies that should be known in order to well understand the algorithms presented in the next chapters.
 
 \subsection{NN (Neural Network)} \label{sec:nn}
-A NN\footnote{A more visually and very well done explanation on how a NN works can be found online. The 3Blue1Brown youtube channel has published videos about  the mechanics of \href{https://www.youtube.com/watch?v=IHZwWFHWa-w}{gradient descent} and about the learning phase based on \href{https://www.youtube.com/watch?v=Ilg3gGewQ5U}{back-propagation}.} is a black box containing several layers (\Cref{fig:howItWorks_NNlayers}). Each layer takes as input the output values of the layer before. The input of the NN goes into the first layer and the output comes from the last one. Each layer is composed by a certain amount of neurons (\Cref{fig:howItWorks_neutron}). Each of these neurons computes a weighted summation of all the output values of the neurons in the previous layer. For each couple of neurons in consecutive layers exists a weight that multiply the output of the first one to generate the input of the next one. The final output of a neuron is then computed by summing up a bias and by applying an activation function such as ReLU (Rectified Linear Unit), SoftMax or Identity.\\
+A NN\footnote{A visual and very well done explanation on how a NN works can be found online. The 3Blue1Brown youtube channel has published videos about the mechanics of \href{https://www.youtube.com/watch?v=IHZwWFHWa-w}{gradient descent} and about the learning phase based on \href{https://www.youtube.com/watch?v=Ilg3gGewQ5U}{back-propagation}.} is a black box containing several layers (\Cref{fig:howItWorks_NNlayers}). Each layer takes as input the output values of the layer before. The input of the NN goes into the first layer and the output comes from the last one. Each layer is composed by a certain amount of neurons (\Cref{fig:howItWorks_neutron}). Each of these neurons computes a weighted summation of all the output values of the neurons in the previous layer. For each couple of neurons in consecutive layers exists a weight that multiplies the output of the first one to generate the input of the next one. The final output of a neuron is then computed by summing up a bias value and by applying an activation function such as ReLU (Rectified Linear Unit), SoftMax or Identity.
 
 \subsubsection*{Gradient descend}
-The final prediction of the NN correspond to the label of the neuron, in the last layer, with the highest value. The overall output of the last layer is evaluated with a cost function. The higher the cost the worst were the prediction, a perfect prediction will have cost equal to zero. The total cost of a model is the average cost, computed on the last layer, over all the input training set.\\
-The training of the NN is based on the minimization of the cost function. Since that the cost function is based on thousands of dimensions that represent the weights, the minimization cannot be analytically solved. The solution is the \textbf{gradient descend} technique. Basically, a set of input values, and all the associated outputs, produce a specific average cost. This generated point in the cost function has a gradient. According to the gradient we know respect to the point where the function has a lower value, hence better performances. The goal is now to tune the weights of all the internal connections of the NN according to the value of the gradient. Everything is clear if the gradient can be computed, and this is possible with the \textbf{back-propagation} technique.
+The final prediction of the NN corresponds to the label of the neuron, in the last layer, with the highest value. The overall output of the last layer is evaluated with a \textbf{cost function}. The higher the cost the worst were the prediction. A perfect prediction will have cost equal to zero. The total cost of a model is the average cost, computed on the last layer, computed on the entire input training set.\\
+The training of the NN is based on the minimization of the cost function. Since that the cost function is based on thousands of dimensions that represent the weights over the entire NN, the minimization cannot be analytically solved. The solution is the \textbf{gradient descend} technique. Basically, a set of input values, and all the associated outputs, produce a specific average cost. This generated value is a point of the cost function, and it has an associated gradient. The measure of the gradient tells us how to modify the weights in order to produce a lower cost on the same input training set. Hence how to improve the NN performances by descending the cost function along the steepest path to reach a local minimum\footnote{We are "only" interest into local minimum since to find the global minimum it is necessary to explore the entire cost function and this requires a huge amount of time.}.\\
+Unfortunately, the generation of the gradient with analytics techniques is unfeasible. Therefore we need the \textbf{back-propagation} technique to measure it.
 
 \subsubsection*{Back-propagation}
-Essentially the gradient represent the direction to the local minimum of the function. Another interpretation is that the magnitude of gradient in a dimension represent how useful a weight is for the final prediction. For each input of the NN the neurons in the last layer should be tuned to produce a cost equal to zero. The variation for each neuron depends on all its input and the respective weights. Each of that input is influenced by all the neurons in the last layer. In addition not only an input is used in the NN but an entire dataset.\\
-The result is a variation for each neuron that aims to reduce the generated cost. This variation will then influence the previous layer and its weights, then the one before and so on and so forth up to the first layer. This is the key idea of the back-propagation.\\
-Once plenty of input has been passed through the NN the weight are finally calibrated. The combination of the NN architecture and its weights is the model.
+Essentially the gradient represents the direction of the steepest path to the local minimum of the function. Another interpretation is that the magnitude of gradient represent for each dimension how the associated weight is useful for the final output prediction. For each input of the NN the neurons in the last layer should be tuned to produce a cost equal to zero. The variation for each neuron, compared to the correct value, depends on all the parameters of its summation. Practically, the elements are the neuron's output of the second-last layer and the associated weights. These parameters are linked one after the other to layers of the NN up to the left-most layer (the first one).\\
+Therefore the last layer parameters can be computed to generate the best possible score. This variation will then influence the previous layer and its weights, then the one before and so on and so forth up to the first layer. This is the key idea of the back-propagation.\\
+Once plenty of input has been passed through the NN and the tuning have been performed a lot of times, the weights are finally calibrated. The result, defined as the combination of the NN architecture and its weights is the called \textbf{model}. In this thesis work we have never built our model but always used pre-trained ones.
 
 \begin{figure}[!h]
 	\centering
 	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[width=\linewidth]{images/howItWorks_NNlayers}
-		\caption{NN}
+		\includegraphics[width=\linewidth]{images/introduction/howItWorks_NN_layers}
+		\captionsetup{margin=0.5cm}
+		\caption{The general structure of a NN. The input, taken from the left, is passed through four layers that generate the NN output on the right side. The four layers are respectively composed of 3, 4, 3 and 2 neurons.}
 		\label{fig:howItWorks_NNlayers}
 	\end{subfigure}
 	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[width=\linewidth]{images/howItWorks_neutron}
-		\captionsetup{margin=0.5cm}
-		\caption{neutron}
+		\includegraphics[width=\linewidth]{images/introduction/howItWorks_NN_neutron}
+		\caption{The functioning scheme of a neuron. The outputs of the left-neurons are multiplied with ad hoc weights and then summed up. In addition, the right-neuron will add a bias value and apply an activation function to produce its output.}
 		\label{fig:howItWorks_neutron}
 	\end{subfigure}
 	\captionsetup{margin=0.5cm}
-	\caption{description.}
+	\caption{Two schemes that represent the key mechanics of a NN.}
 	\label{fig:howItWorks_NN}
 \end{figure}
 
 \subsection{CNN (Convolutional Neural Network)} \label{sec:cnn}
-\href{https://www.youtube.com/watch?v=YRhxdVk_sIs}{CNN} from deepLizard
+A CNN\footnote{A visual explanation of the CNN, created by the DeepLizard youtube channel, is available \href{https://www.youtube.com/watch?v=YRhxdVk_sIs}{here}.}, also called \textbf{ConvNet}, is a standard NN extended to process images.\\
+The novelty of this NN is characterized by a new type of layers: the \textbf{convolutional layers}. These layers are the main components of a CNN and are stacked one after the other. Often the end of the NN is composed of few traditional layers that compress the huge output of the previous layers to generate the overall output of the CNN. A convolutional layer is a block created to discover patterns inside an image. These patterns are initially simple like stripes and corners (a visual example is shown in~\Cref{fig:example_CNN_patterns}). Then, by combining a lot of convolutional layers the learned patterns are always more complicated. Whether the CNN is trained to recognise people these advanced schemes may represent entire objects such as hands, arms, legs, and so on and so forth.
+
+\subsubsection*{Convolution filter}
+A convolution layer is based on the mathematical operation of a convolution.\\
+This operation is based on a \textbf{filter} that is a \textbf{small squared matrix} of real numbers ($\in [0, 1]$). This matrix will slide over all the image pixel by pixel, this shifting is called \textbf{convolving}. For each shift the filter produce an output that is the dot-product of the actual portion of the image times the filter. In~\Cref{fig:howItWorks_CNN} is shown a numeric example of how the convolution filter works.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.29\textwidth}
+		\includegraphics[width=\linewidth]{images/introduction/example_CNN_patterns}
+		\caption{Example of simple patterns generated by a CNN.}
+		%For more complex image:
+		%The elaboration of an input image with deeper and deeper convolutional filters. The result are increasingly complicated patterns.
+		\label{fig:example_CNN_patterns}
+	\end{subfigure}
+	\begin{subfigure}{0.7\textwidth}
+		\includegraphics[width=\linewidth]{images/introduction/howItWorks_CNN}
+		\captionsetup{margin=0.5cm}
+		\caption{A numeric example of a convolution operation. The top-left, 3x3, section of the image is multiplied with a dot-product by the filter. The result is placed in the output matrix in the top-left corner.}
+		\label{fig:howItWorks_CNN}
+	\end{subfigure}
+	\captionsetup{margin=0.5cm}
+	\caption{The overall mechanics of a CNN.}
+	\label{fig:CNN}
+\end{figure}
+
 
 \section{Structure of the thesis}
 The next chapters are organized as follows. This section concludes the introduction (\Cref{cha:introduction}).\\
