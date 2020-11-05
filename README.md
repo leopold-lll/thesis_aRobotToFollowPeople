@@ -1,5 +1,5 @@
 # thesis_aRobotToFollowPeople
-This is the master thesis of **Stefano Leonardi** for the **University of Trento** in collaboration with **[Dolomiti Robotics](https://dolomitirobotics.it/)**.
+This is the master thesis of **Stefano Leonardi** for the **[University of Trento](https://www.unitn.it/en)** in collaboration with **[Dolomiti Robotics](https://dolomitirobotics.it/)**.
 
 The thesis is based on the homonymous project [aRobotToFollowPeople](https://github.com/leopold-lll/aRobotToFollowPeople). 
 A [demo](https://drive.google.com/file/d/1s_sXa-Q7-MVhQVobPWRdU7K5oFsKyt4N/view?usp=sharing) of the software is available.
